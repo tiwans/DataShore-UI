@@ -12,11 +12,11 @@ if(varSelect){
         console.log(varSelect.value)
         var varRequire = document.getElementById("variable-require-result");
         if(varSelect.value == "salinity") {
-            varRequire.innerHTML = "<button type='button' class='mdl-chip' id='csvFileUpload' accept='.csv'><span class='mdl-chip__text'>Temperature</span></button> <button type='button' class='mdl-chip'><span class='mdl-chip__text'>Density</span></button> <input type='file' name='File Upload' id='txtFileUpload' onchange='startUpload(event)' accept='.csv'/> <button type='button' id='nextStep' class='mdl-chip'><span class='mdl-chip__text'>Next</span></button>"
+            varRequire.innerHTML = "<button type='button' class='mdl-chip' id='csvFileUpload' accept='.csv'><span class='mdl-chip__text'>Temperature</span></button> <button type='button' class='mdl-chip'><span class='mdl-chip__text'>Density</span></button> <input type='file' name='File Upload' id='txtFileUpload' onchange='startUpload(event)' accept='.csv'/> <button type='button' id='nextStep' class='mdl-chip'><span class='mdl-chip__text'><a href='src/visualize.html'>Next</span></button>"
             //fileUploaeded = document.getElementById('txtFileUpload');
         }
         if(varSelect.value == "temperature") {
-            varRequire.innerHTML = "<button type='button' class='mdl-chip' id='csvFileUpload' accept='.csv'><span class='mdl-chip__text'>Density</span></button> <button type='button' class='mdl-chip'><span class='mdl-chip__text'>Salinity</span></button> <input type='file' name='File Upload' id='txtFileUpload' onchange='startUpload(event)' accept='.csv'/> <button type='button' id='nextStep' class='mdl-chip'><span class='mdl-chip__text'>Next</span></button>"
+            varRequire.innerHTML = "<button type='button' class='mdl-chip' id='csvFileUpload' accept='.csv'><span class='mdl-chip__text'>Density</span></button> <button type='button' class='mdl-chip'><span class='mdl-chip__text'>Salinity</span></button> <input type='file' name='File Upload' id='txtFileUpload' onchange='startUpload(event)' accept='.csv'/> <button type='button' id='nextStep' class='mdl-chip'><span class='mdl-chip__text'><a href='src/visualize.html'>Next</span></button>"
             //fileUploaeded = document.getElementById('txtFileUpload');
         }
         if(varSelect.value == "density") {
