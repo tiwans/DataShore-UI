@@ -1,0 +1,34 @@
+h1 {
+    color: blue;
+
+}
+
+.home{
+    margin: auto;
+    width: 50%;
+    border-radius: 10px;
+} 
+
+#variable-select{
+    margin-top: 100px;
+}
+
+#variable-require{
+    margin-top: 20px;
+    border: 1px solid darkslateblue;
+}
+
+#variable-require .panel-heading{
+    background-color: darkslateblue;
+    border:none;
+    border-radius: 0px;
+    color: white;
+}
+
+.dropdown{
+    margin: 0px 10px 10px 10px;
+}
+
+#variable-require-result{
+    margin: 10px 10px 10px 10px
+}

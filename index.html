@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<link href = "src/css/index.css" type = "text/css" rel = "stylesheet" />
+		<title>DataShore</title>
+		<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.0/jquery.min.js"></script>
+        <link href="https://d13yacurqjgara.cloudfront.net/users/168152/screenshots/2082130/justinblock_wave_800x600r1.jpg" type="image/png" rel="shortcut icon" />
+        <script src="https://code.getmdl.io/1.3.0/material.min.js"></script>
+        <link rel="stylesheet" href="https://code.getmdl.io/1.3.0/material.indigo-pink.min.css">
+        <!-- Material Design icon font -->
+        <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+        <script src="https://d3js.org/d3.v4.min.js"></script>
+        <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+        <script src="/jquery-csv/src/jquery.csv.js"></script>
+	</head>
+	
+	<body>
+        <div class="mdl-layout mdl-js-layout mdl-layout--fixed-header">
+            <header class="mdl-layout__header">
+                <div class="mdl-layout__header-row">
+                <!-- Title -->
+                <span class="mdl-layout-title">DataShore</span>
+                <!-- Add spacer, to align navigation to the right -->
+                <div class="mdl-layout-spacer"></div>
+                <!-- Navigation. We hide it in small screens. -->
+                    <nav class="mdl-navigation">
+                        <div id="help" class="icon material-icons">help</div>
+                        <div class="mdl-tooltip mdl-tooltip--large" data-mdl-for="help">Help</div>
+                    </nav>
+                </div>
+            </header>
+            <div class="mdl-layout__drawer">
+                <span class="mdl-layout-title">DataShore</span>
+                <nav class="mdl-navigation">
+                <a class="mdl-navigation__link" href=""><i class="material-icons">home</i>Home</a>
+                <a class="mdl-navigation__link" href=""><i class="material-icons">dashboard</i>DashBoard</a>
+                <a class="mdl-navigation__link" href=""><i class="material-icons">supervisor_account</i>Account</a>
+                <a class="mdl-navigation__link" href=""><i class="material-icons">exit_to_app</i>Log Out</a>
+                </nav>
+            </div>
+            <main class="mdl-layout__content">
+                <div id="page-content"><!-- Your content goes here -->
+                    <div class="home panel panel-info" id="variable-select">
+                        <div class="panel-heading">
+                            <h2 class="panel-title">Welcome to DataShore</h2>
+                        </div>
+                        <div class="panel-body">Choose a varibale to predict!</div>
+                        <div>
+                            <select id="varSelect" class="dropdown">
+                                 <option value="">---</option>
+                                <option value="salinity">Salinity</option>
+                                <option value="temperature">Temperature</option>
+                                <option value="density">Density</option>
+                                <option value="other">Other</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="home panel" id="variable-require">
+                        <div class="panel-heading">
+                            <h2 class="panel-title">Prepare to Upload your Data</h2>
+                        </div>
+                        <div class="panel-body">The required varables needed to predict</div>
+                        <div>
+                            <p id="variable-require-result"></p>
+                        </div>
+                    </div>
+                    <div id="file-upload"></div>
+                    <div id="part2"></div>
+                    <div id="part3"></div>
+                </div>
+            </main>
+        </div>
+	</body>
+    <script src="src/index.js"></script>
+</html>
