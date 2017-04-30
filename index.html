@@ -41,34 +41,53 @@
                 </nav>
             </div>
             <main class="mdl-layout__content">
+                <div class="process_bar">
+                    <div class="row bs-wizard" style="border-bottom:0;">
+                
+                        <div class="col-xs-3 bs-wizard-step active" id="creat_pro_stg">
+                            <div class="text-center bs-wizard-stepnum">Create Project</div>
+                            <div class="progress"><div class="progress-bar"></div></div>
+                            <a href="#" class="bs-wizard-dot"></a>
+                            <div class="bs-wizard-info text-center">Give a name to your project </br>so that you can come back </br>and continue edit it.</div>
+                        </div>
+                        
+                        <div class="col-xs-3 bs-wizard-step disabled" id="select_var_stg"><!-- complete -->
+                            <div class="text-center bs-wizard-stepnum">Select Variable</div>
+                            <div class="progress"><div class="progress-bar"></div></div>
+                            <a href="#" class="bs-wizard-dot"></a>
+                            <div class="bs-wizard-info text-center">Select the variable </br>you want to predict</div>
+                        </div>
+                        
+                        <div class="col-xs-3 bs-wizard-step disabled" id="upload_dt_stg"><!-- complete -->
+                            <div class="text-center bs-wizard-stepnum">Upload Data</div>
+                            <div class="progress"><div class="progress-bar"></div></div>
+                            <a href="#" class="bs-wizard-dot"></a>
+                            <div class="bs-wizard-info text-center">Upload the file </br> and select the dataset </br> you want to upload</div>
+                        </div>
+                        
+                        <div class="col-xs-3 bs-wizard-step disabled" id="view_dt_stg"><!-- active -->
+                            <div class="text-center bs-wizard-stepnum">View Output</div>
+                            <div class="progress"><div class="progress-bar"></div></div>
+                            <a href="#" class="bs-wizard-dot"></a>
+                            <div class="bs-wizard-info text-center"> View the result of </br>the predicted output</div>
+                        </div>
+                    </div>
+                </div>
                 <div id="page-content"><!-- Your content goes here -->
-                    <div class="home panel panel-info" id="variable-select">
-                        <div class="panel-heading">
-                            <h2 class="panel-title">Welcome to DataShore</h2>
-                        </div>
-                        <div class="panel-body">Choose a varibale to predict!</div>
-                        <div>
-                            <select id="varSelect" class="dropdown">
-                                 <option value="">---</option>
-                                <option value="salinity">Salinity</option>
-                                <option value="temperature">Temperature</option>
-                                <option value="density">Density</option>
-                                <option value="other">Other</option>
-                            </select>
-                        </div>
-                    </div>
-                    <div class="home panel" id="variable-require">
-                        <div class="panel-heading">
-                            <h2 class="panel-title">Prepare to Upload your Data</h2>
-                        </div>
-                        <div class="panel-body">The required varables needed to predict</div>
-                        <div>
-                            <p id="variable-require-result"></p>
+                    <div id="stage_content">
+                        <div class="home panel" id="create_project">
+                            <div class="panel-heading">
+                                <h2 class="panel-title">Create Project</h2>
+                            </div>
+                            <div class="panel-body">Name your project
+                                <div class="input-group project_name">
+                                    <span class="input-group-addon" id="sizing-addon2">Name</span>
+                                    <input type="text" class="form-control" placeholder="Project Name" aria-describedby="sizing-addon2">
+                                </div>
+                                <button type="button" class="btn btn-default project_name" id="create_project_btn">Create</button>
+                            </div>
                         </div>
                     </div>
-                    <div id="file-upload"></div>
-                    <div id="part2"></div>
-                    <div id="part3"></div>
                 </div>
             </main>
         </div>
