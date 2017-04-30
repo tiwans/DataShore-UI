@@ -65,8 +65,8 @@ function upload(evt) {
         var reader = new FileReader();
         //alert(file);
         reader.readAsText(file);
-        reader.onload = function(event) {
-            var csvData = event.target.result;
+        reader.onload = function(evt) {
+            var csvData = evt.target.result;
             data = $.csv.toArrays(csvData);
             if (data && data.length > 0) {
                 viewOutput(data);
