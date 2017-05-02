@@ -128,8 +128,17 @@ function upload(){
         csvData = evt.target.result;
         data = $.csv.toArrays(csvData);
         if (data && data.length > 0) {
-
-            viewOutput(data);
+            $(document).ready(function(){
+                $.ajax({
+                    type: "POST",
+                    url: "src/test",
+                    data: {csvData}
+                }).done(function() {
+                // do something
+                    alert("finished");
+                });
+                viewOutput(data);
+            });
         }else{
             reader.onerror = function() {
                 alert('Unable to read ' + file.fileName);
