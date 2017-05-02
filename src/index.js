@@ -7,8 +7,20 @@ var stg_count=0;
 var csvData;
 var file;
 var data;
+var output_res;
 var res_len;
 var stg_array=['creat_pro_stg','select_var_stg','upload_dt_stg','view_dt_stg'];
+//############## Initialize Firebase ##############//
+var config = {
+    apiKey: "AIzaSyANfwhjv-oRcJhVp6sQfArTorgh4jsZFJw",
+    authDomain: "datashore-7057d.firebaseapp.com",
+    databaseURL: "https://datashore-7057d.firebaseio.com",
+    projectId: "datashore-7057d",
+    storageBucket: "datashore-7057d.appspot.com",
+    messagingSenderId: "352958906618"
+  };
+firebase.initializeApp(config);
+var database = firebase.database();
 //##############Different Process Stage###########//
 var create_project = "<div class='home panel' id='create_project'><div class='panel-heading'><h2 class='panel-title'>Create Project</h2></div><div class='panel-body'>Name your project<div class='input-group project_name'><span class='input-group-addon' id='sizing-addon2'>Name</span><input type='text' class='form-control' placeholder='Project Name' aria-describedby='sizing-addon2' id='project_name'></div><button type='button' class='btn btn-default stg_btn' onClick=creatPro()>Create</button></div></div>";
 var select_var = '<div class="home panel" id="variable-select"><div class="panel-heading"><h2 class="panel-title">Select Variable</h2></div><div class="panel-body">Choose a varibale to predict!</div><div><select id="varSelect" class="dropdown" onchange="selectVar(event)"><option value="">---</option><option value="salinity">Salinity</option><option value="temperature">Temperature</option><option value="density">Density</option><option value="other">Other</option></select></div></div> <div class="home panel" id="variable-require"><div class="panel-heading"><h2 class="panel-title">Prepare to Upload your Data</h2></div><div class="panel-body">The required varables needed to predict</div><div><p id="variable-require-result"></p></div></div>';
@@ -137,8 +149,10 @@ function upload(){
                 // do something
                     alert("finished");
                 });
-                viewOutput(data);
             });
+            writeData(project_name);
+
+            viewOutput(data);
         }else{
             reader.onerror = function() {
                 alert('Unable to read ' + file.fileName);
@@ -148,6 +162,20 @@ function upload(){
 }
 
 
+function writeData(project_name){
+    database.ref('project/' + project_name).set({
+        Project_Tittle: project_name,
+        CreateDate: Date(),
+        Uploaded_File: csvData,
+        Output_file: null,
+        Variable: "set1",
+        Chart:{},
+        User:{},
+        Collaboratores:{}
+    });
+    console.log("finished");
+}
+
 function viewOutput(data){
     alert('Imported -' + data.length + '- rows successfully!');
     document.getElementById("upload_dt_stg").classList.remove('active');
@@ -156,17 +184,18 @@ function viewOutput(data){
     document.getElementById("view_dt_stg").classList.add("complete");
     document.getElementById('stage_content').innerHTML = output_dt;
     res_len = 1;
+    retrive_output(project_name);
     creatTB(res_len);
     stg_count++;
 }
 
 function download(){
     var csvContent = "data:text/csv;charset=utf-8,";
-    data = data.slice(1);
-    data.forEach(function(infoArray, index){
+    var output = data.slice(1);
+    output.forEach(function(infoArray, index){
         console.log(infoArray);
         var dataString = infoArray.join(",");
-        csvContent += index < data.length ? dataString+ "\n" : dataString;
+        csvContent += index < output.length ? dataString+ "\n" : dataString;
     }); 
 
     var encodedUri = encodeURI(csvContent);
@@ -178,21 +207,34 @@ function download(){
     link.click();
 }
 
+function retrive_output(project_name){
+    var dataRef = database.ref('project/' + project_name);
+    dataRef.once('value', function(snapshot) {
+        snapshot.forEach(function(child) {
+            if(child.key == 'Uploaded_File'){
+                console.log(child.val());
+                output_res = child.val();
+            }
+        });
+    });
+}
+
 function creatTB(res_len){
     var table = document.getElementById('output_table');
     var tbody = document.createElement('tbody');
     var startParse = false;
     var nonbody_count = 0;
     var index = 0;
-    while(index < data.length){
-        console.log(data[index]);
-        var dataRow = data[index];
+    output_res = $.csv.toArrays(output_res);
+    while(index < output_res.length){
+        console.log(output_res[index]);
+        var dataRow = output_res[index];
         if(dataRow[0]=="data"){
             nonbody_count = index + 1;
             console.log(nonbody_count);
             startParse = true;
             index = index + 1;
-            dataRow = data[index];
+            dataRow = output_res[index];
             var thead = document.createElement('thead');
             var head_row = document.createElement('tr');
             var head_cell = document.createElement('th');
