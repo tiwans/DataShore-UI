@@ -1,16 +1,76 @@
 "use strict";
-//create the event listener
-var create_project = "<div class='home panel' id='create_project'><div class='panel-heading'><h2 class='panel-title'>Create Project</h2></div><div class='panel-body'>Name your project<div class='input-group project_name'><span class='input-group-addon' id='sizing-addon2'>Name</span><input type='text' class='form-control' placeholder='Project Name' aria-describedby='sizing-addon2'></div><button type='button' class='btn btn-default project_name'>Create</button></div></div>";
+
+// init variables
+var stage_content = document.getElementById('stage_content');
+var project_name;
+var stg_count=0;
+var csvData;
+var file;
+var data;
+var res_len;
+var stg_array=['creat_pro_stg','select_var_stg','upload_dt_stg','view_dt_stg'];
+//##############Different Process Stage###########//
+var create_project = "<div class='home panel' id='create_project'><div class='panel-heading'><h2 class='panel-title'>Create Project</h2></div><div class='panel-body'>Name your project<div class='input-group project_name'><span class='input-group-addon' id='sizing-addon2'>Name</span><input type='text' class='form-control' placeholder='Project Name' aria-describedby='sizing-addon2' id='project_name'></div><button type='button' class='btn btn-default stg_btn' onClick=creatPro()>Create</button></div></div>";
 var select_var = '<div class="home panel" id="variable-select"><div class="panel-heading"><h2 class="panel-title">Select Variable</h2></div><div class="panel-body">Choose a varibale to predict!</div><div><select id="varSelect" class="dropdown" onchange="selectVar(event)"><option value="">---</option><option value="salinity">Salinity</option><option value="temperature">Temperature</option><option value="density">Density</option><option value="other">Other</option></select></div></div> <div class="home panel" id="variable-require"><div class="panel-heading"><h2 class="panel-title">Prepare to Upload your Data</h2></div><div class="panel-body">The required varables needed to predict</div><div><p id="variable-require-result"></p></div></div>';
-var upload_data = "<div class='home panel' id='upload_data'><div class='panel-heading'><h2 class='panel-title'>Upload Data</h2></div><div class='panel-body'>Choose the file to uploadupload_data<input type='file' name='File Upload' id='txtFileUpload' onChange='upload(event)' accept='.csv'/></div><button type='button' class='btn btn-default project_name'>Upload</button></div></div>";
-console.log("call")
-document.getElementById('create_project_btn').addEventListener("click", function(){
+var upload_data = "<div class='home panel' id='upload_data'><div class='panel-heading'><h2 class='panel-title'>Upload Data</h2></div><div class='panel-body'>Choose the file to uploadupload_data<input type='file' name='File Upload' id='txtFileUpload' onChange='browse(event)' accept='.csv'/><button type='button' class='btn btn-default stg_btn' onClick='upload()'>Upload</button></div></div>";
+var output_dt="<div class='home panel' id='output_dt'><div class='panel-heading'><h2 class='panel-title'>View Output</h2></div><div class='panel-body'><div id=table_div'><table class='table table-striped' id='output_table'></table></div><button type='button' class='btn btn-default stg_btn' onClick=download()>Download Output</button></div></div>"
+
+//##############End of Different Process Stage###########//
+init();
+
+function init(){
+    stage_content.innerHTML = create_project;
+}
+
+//#### modal ####//
+function rollbaclModal(clicked_id){
+    if(stg_count < stg_array.indexOf(clicked_id)){
+        alert("you cannot skip this page without finish it or please cick the next button to continue");
+    }else{
+        $("#myModal").modal();
+        $("#modal_leave").click(function(){
+            rollback(clicked_id);
+        })
+    }
+}
+
+//rollback to the desired stage
+function rollback(clicked_id){
+    var prev_stg_count = stg_count;
+    stg_count = stg_array.indexOf(clicked_id);
+    console.log("stg_count", stg_count);
+    document.getElementById(stg_array[prev_stg_count]).classList.remove('active');
+    console.log("prev_stg_count",prev_stg_count);
+    while(prev_stg_count > stg_count){
+        document.getElementById(stg_array[prev_stg_count]).classList.remove('complete');
+        document.getElementById(stg_array[prev_stg_count]).classList.add('disabled');
+        prev_stg_count --;
+        console.log("prev_stg_count",prev_stg_count);
+    }
+    document.getElementById(stg_array[stg_count]).classList.remove('complete');
+    document.getElementById(stg_array[stg_count]).classList.add('active');
+    if(stg_count == 0){
+        stage_content.innerHTML = create_project;
+    }else if(stg_count == 1){
+        stage_content.innerHTML = select_var;
+    }else if(stg_count == 2){
+        stage_content.innerHTML = upload_data;
+    }else if(stg_count == 3){
+        stage_content.innerHTML = output_dt;
+    }
+}
+
+
+function creatPro(){
+    project_name = document.getElementById('project_name').value;
     document.getElementById('stage_content').innerHTML = select_var;
     document.getElementById("creat_pro_stg").classList.remove('active');
     document.getElementById("creat_pro_stg").classList.add('complete');
     document.getElementById("select_var_stg").classList.remove('disabled');
     document.getElementById("select_var_stg").classList.add("active");
-})
+    stg_count=0;
+}
+
 function selectVar(evt){
     console.log("selectVar")
      evt.preventDefault();
@@ -19,17 +79,15 @@ function selectVar(evt){
         console.log(varSelect.value)
         var varRequire = document.getElementById("variable-require-result");
         if(varSelect.value == "salinity") {
-            varRequire.innerHTML = "<button type='button' class='mdl-chip' id='csvFileUpload' accept='.csv'><span class='mdl-chip__text'>Temperature</span></button> <button type='button' class='mdl-chip'><span class='mdl-chip__text'>Density</span></button> <button type='button' id='nextStep' class='mdl-chip' onClick='startUpload()'><span class='mdl-chip__text'>Next</span></button>"
-            //fileUploaeded = document.getElementById('txtFileUpload');
+            varRequire.innerHTML = "<button type='button' class='mdl-chip' id='csvFileUpload' accept='.csv'><span class='mdl-chip__text'>Temperature</span></button> <button type='button' class='mdl-chip'><span class='mdl-chip__text'>Density</span></button> <div><button type='button' id='nextStep' class='btn btn-default stg_btn' onClick='startUpload()'><span class='mdl-chip__text'>Next</span></button></div>"
         }
         if(varSelect.value == "temperature") {
-            varRequire.innerHTML = "<button type='button' class='mdl-chip' id='csvFileUpload' accept='.csv'><span class='mdl-chip__text'>Density</span></button> <button type='button' class='mdl-chip'><span class='mdl-chip__text'>Salinity</span></button>  <button type='button' id='nextStep' class='mdl-chip' onClick='startUpload()'><span class='mdl-chip__text'>Next</span></button>"
-            //fileUploaeded = document.getElementById('txtFileUpload');
+            varRequire.innerHTML = "<button type='button' class='mdl-chip' id='csvFileUpload' accept='.csv'><span class='mdl-chip__text'>Density</span></button> <button type='button' class='mdl-chip'><span class='mdl-chip__text'>Salinity</span></button>  <div><button type='button' id='nextStep' class='btn btn-default stg_btn' onClick='startUpload()'><span class='mdl-chip__text'>Next</span></button></div>"
         }
         if(varSelect.value == "density") {
-            varRequire.innerHTML = "<button type='button' class='mdl-chip' id='csvFileUpload' accept='.csv'><span class='mdl-chip__text'>Temperature</span></button> <button type='button' class='mdl-chip'><span class='mdl-chip__text'>salinity</span></button>  <button type='button' id='nextStep' class='mdl-chip' onClick='startUpload()'><span class='mdl-chip__text'>Next</span></button>"
-            //fileUploaeded = document.getElementById('txtFileUpload');
+            varRequire.innerHTML = "<button type='button' class='mdl-chip' id='csvFileUpload' accept='.csv'><span class='mdl-chip__text'>Temperature</span></button> <button type='button' class='mdl-chip'><span class='mdl-chip__text'>salinity</span></button>  <div><button type='button' id='nextStep' class='btn btn-default stg_btn' onClick='startUpload()'><span class='mdl-chip__text'>Next</span></button></div>"
         }
+        stg_count++;
     }else{
         console.log("null")
     }
@@ -42,52 +100,126 @@ function startUpload(){
     document.getElementById("upload_dt_stg").classList.remove('disabled');
     document.getElementById("upload_dt_stg").classList.add("active");
     document.getElementById('stage_content').innerHTML=upload_data;
+    stg_count++;
 }
-// upload(evt);
+
 function browserSupportFileUpload() {
     var isCompatible = false;
     if (window.File && window.FileReader && window.FileList && window.Blob) {
         isCompatible = true;
-        //alert("isCompatible");
     }
     return isCompatible;
 }
 
 // Method that reads and processes the selected file
-function upload(evt) {
+function browse(evt) {
     evt.preventDefault();
     if (!browserSupportFileUpload()) {
-        //alert('The File APIs are not fully supported in this browser!');
+        alert('The File APIs are not fully supported in this browser!');
     } else {
-        //alert("start to read");
-        var data = null;
-        var file = evt.target.files[0];
-        var reader = new FileReader();
-        //alert(file);
-        reader.readAsText(file);
-        reader.onload = function(evt) {
-            var csvData = evt.target.result;
-            data = $.csv.toArrays(csvData);
-            if (data && data.length > 0) {
-                viewOutput(data);
-            }else{
-                reader.onerror = function() {
-                    alert('Unable to read ' + file.fileName);
-                };
-            }
-        }
+        file = evt.target.files[0];
     }   
+}
+
+function upload(){
+    var reader = new FileReader();
+    reader.readAsText(file);
+    reader.onload = function(evt) {
+        csvData = evt.target.result;
+        data = $.csv.toArrays(csvData);
+        if (data && data.length > 0) {
+
+            viewOutput(data);
+        }else{
+            reader.onerror = function() {
+                alert('Unable to read ' + file.fileName);
+            };
+        }
+    }
 }
 
 
 function viewOutput(data){
     alert('Imported -' + data.length + '- rows successfully!');
-    var output_dt='<table class="table table-striped"><thead><tr><th>#</th><th>First Name</th><th>Last Name</th><th>Username</th></tr></thead><tbody><tr><th scope="row">1</th><td>Mark</td><td>Otto</td><td>@mdo</td></tr><tr><th scope="row">2</th><td>Jacob</td><td>Thornton</td><td>@fat</td></tr><tr><th scope="row">3</th><td>Larry</td><td>the Bird</td><td>@twitter</td></tr></tbody></table>'
     document.getElementById("upload_dt_stg").classList.remove('active');
     document.getElementById("upload_dt_stg").classList.add('complete');
     document.getElementById("view_dt_stg").classList.remove('disabled');
     document.getElementById("view_dt_stg").classList.add("complete");
     document.getElementById('stage_content').innerHTML = output_dt;
+    res_len = 1;
+    creatTB(res_len);
+    stg_count++;
 }
 
+function download(){
+    var csvContent = "data:text/csv;charset=utf-8,";
+    data = data.slice(1);
+    data.forEach(function(infoArray, index){
+        console.log(infoArray);
+        var dataString = infoArray.join(",");
+        csvContent += index < data.length ? dataString+ "\n" : dataString;
+    }); 
+
+    var encodedUri = encodeURI(csvContent);
+    var link = document.createElement("a");
+    link.setAttribute("href", encodedUri);
+    link.setAttribute("download", project_name+".csv");
+    document.body.appendChild(link); // Required for FF
+
+    link.click();
+}
+
+function creatTB(res_len){
+    var table = document.getElementById('output_table');
+    var tbody = document.createElement('tbody');
+    var startParse = false;
+    var nonbody_count = 0;
+    var index = 0;
+    while(index < data.length){
+        console.log(data[index]);
+        var dataRow = data[index];
+        if(dataRow[0]=="data"){
+            nonbody_count = index + 1;
+            console.log(nonbody_count);
+            startParse = true;
+            index = index + 1;
+            dataRow = data[index];
+            var thead = document.createElement('thead');
+            var head_row = document.createElement('tr');
+            var head_cell = document.createElement('th');
+            head_cell.innerHTML = "#";
+            head_row.appendChild(head_cell);
+            dataRow.forEach(function(element, i){
+                var data_len = dataRow.length - res_len;
+                if(i < data_len){
+                    var head_cell = document.createElement('th');
+                    head_cell.innerHTML = element;
+                    head_row.appendChild(head_cell);
+                }else{
+                    var head_cell = document.createElement('th');
+                    head_cell.innerHTML = element + "(result)";
+                    head_row.appendChild(head_cell);
+                }
+            });
+            thead.appendChild(head_row);
+            table.appendChild(thead);
+        }else if(dataRow[0]!="data" && startParse){
+            var body_row = document.createElement('tr');
+            var body_index = document.createElement('th');
+            body_index.setAttribute("scope","row");
+            body_index.innerHTML = index-nonbody_count;
+            body_row.appendChild(body_index);
+            dataRow.forEach(function(element, i){
+                var body_cell = document.createElement('td');
+                body_cell.innerHTML = dataRow[i];
+                body_row.appendChild(body_cell);
+            });
+            tbody.appendChild(body_row);
+        }else{
+            //do nothing;
+        }
+        index = index + 1;
+    }
+    table.appendChild(tbody);
+}
 
