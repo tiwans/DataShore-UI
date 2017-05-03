@@ -140,16 +140,16 @@ function upload(){
         csvData = evt.target.result;
         data = $.csv.toArrays(csvData);
         if (data && data.length > 0) {
-            $(document).ready(function(){
-                $.ajax({
-                    type: "POST",
-                    url: "src/test",
-                    data: {csvData}
-                }).done(function() {
-                // do something
-                    alert("finished");
-                });
-            });
+            // $(document).ready(function(){
+            //     $.ajax({
+            //         type: "POST",
+            //         url: "src/test",
+            //         data: {csvData}
+            //     }).done(function() {
+            //     // do something
+            //         alert("finished");
+            //     });
+            // });
             writeData(project_name);
 
             viewOutput(data);
