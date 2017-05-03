@@ -9,6 +9,9 @@ var file;
 var data;
 var output_res;
 var res_len;
+var pred_var;
+var upload_var;
+var template_var = [];
 var stg_array=['creat_pro_stg','select_var_stg','upload_dt_stg','view_dt_stg'];
 //############## Initialize Firebase ##############//
 var config = {
@@ -92,13 +95,27 @@ function selectVar(evt){
         var varRequire = document.getElementById("variable-require-result");
         if(varSelect.value == "salinity") {
             varRequire.innerHTML = "<button type='button' class='mdl-chip' id='csvFileUpload' accept='.csv'><span class='mdl-chip__text'>Temperature</span></button> <button type='button' class='mdl-chip'><span class='mdl-chip__text'>Density</span></button> <div><button type='button' id='nextStep' class='btn btn-default stg_btn' onClick='startUpload()'><span class='mdl-chip__text'>Next</span></button></div>"
+            pred_var = 'salinity';
+            upload_var = ['temperature', 'density'];
+
         }
         if(varSelect.value == "temperature") {
             varRequire.innerHTML = "<button type='button' class='mdl-chip' id='csvFileUpload' accept='.csv'><span class='mdl-chip__text'>Density</span></button> <button type='button' class='mdl-chip'><span class='mdl-chip__text'>Salinity</span></button>  <div><button type='button' id='nextStep' class='btn btn-default stg_btn' onClick='startUpload()'><span class='mdl-chip__text'>Next</span></button></div>"
+            pred_var = 'temperature';
+            upload_var = ['salinity', 'density'];
         }
         if(varSelect.value == "density") {
             varRequire.innerHTML = "<button type='button' class='mdl-chip' id='csvFileUpload' accept='.csv'><span class='mdl-chip__text'>Temperature</span></button> <button type='button' class='mdl-chip'><span class='mdl-chip__text'>salinity</span></button>  <div><button type='button' id='nextStep' class='btn btn-default stg_btn' onClick='startUpload()'><span class='mdl-chip__text'>Next</span></button></div>"
+            pred_var = 'density';
+            upload_var = ['temperature', 'salinity'];
         }
+        // upload_var.forEach(function(data,index){
+        //     template_var[index] = data;
+        // });
+        template_var[0]=pred_var;
+        upload_var.forEach(function(data,index){
+            template_var[index+1]=data;
+        });
         stg_count++;
     }else{
         console.log("null")
@@ -107,6 +124,7 @@ function selectVar(evt){
 
 function startUpload(){
     // Method that checks that the browser supports the HTML5 File API
+    downloadTemplate(template_var);
     document.getElementById("select_var_stg").classList.remove('active');
     document.getElementById("select_var_stg").classList.add('complete');
     document.getElementById("upload_dt_stg").classList.remove('disabled');
@@ -202,6 +220,25 @@ function download(){
     var link = document.createElement("a");
     link.setAttribute("href", encodedUri);
     link.setAttribute("download", project_name+".csv");
+    document.body.appendChild(link); // Required for FF
+
+    link.click();
+}
+
+function downloadTemplate(template_var){
+    var csvContent = "data:text/csv;charset=utf-8,";
+    var output = [['data'],template_var];
+
+    output.forEach(function(infoArray, index){
+        console.log(infoArray);
+        var dataString = infoArray.join(",");
+        csvContent += index < output.length ? dataString+ "\n" : dataString;
+    }); 
+
+    var encodedUri = encodeURI(csvContent);
+    var link = document.createElement("a");
+    link.setAttribute("href", encodedUri);
+    link.setAttribute("download", project_name+"_template.csv");
     document.body.appendChild(link); // Required for FF
 
     link.click();
