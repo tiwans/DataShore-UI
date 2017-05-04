@@ -33,9 +33,36 @@ var output_dt="<div class='home panel' id='output_dt'><div class='panel-heading'
 //##############End of Different Process Stage###########//
 init();
 
+
+//#### init ####//
 function init(){
     stage_content.innerHTML = create_project;
 }
+
+
+//#### tutorial ####//
+function showTut(){
+    var tut_innerHTML='<div><img src="src/tut_1.1.png" alt="tutorial_1" id="tut_img_1"><img src="src/tut_2.png" alt="tutorial_2" id="tut_img_2"><button type="button" id="tut_done" class="mdl-button mdl-button--fab" onClick="removeTut()"><i class="material-icons" id="tut_icon">clear</i></button></div>';
+    $("#modal_tut").modal();
+        $("#tut_leave").click(function(){
+            var tut_div = document.createElement('div');
+            tut_div.setAttribute('id','tutorial');
+            tut_div.innerHTML = tut_innerHTML;
+            var body = document.getElementById('container');
+            body.appendChild(tut_div);
+            document.getElementById('tutorial').innerHTML = tut_innerHTML;
+    })
+}
+
+function removeTut(){
+    alert('click');
+    var tut_div = document.getElementById('tutorial');
+    tut_div.innerHTML = "";
+    var body = document.getElementById('container');
+    body.removeChild(tut_div);
+}
+
+//#### end of tutorial ####//
 
 //#### modal ####//
 function rollbaclModal(clicked_id){
@@ -109,9 +136,6 @@ function selectVar(evt){
             pred_var = 'density';
             upload_var = ['temperature', 'salinity'];
         }
-        // upload_var.forEach(function(data,index){
-        //     template_var[index] = data;
-        // });
         template_var[0]=pred_var;
         upload_var.forEach(function(data,index){
             template_var[index+1]=data;
