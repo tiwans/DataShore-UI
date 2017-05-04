@@ -71,6 +71,7 @@ function removeTut(){
     var tut_btn_div = document.getElementById('tut_btn_div');
     var container = document.getElementById('container');
     container.removeChild(tut_btn_div);
+    $(".bs-wizard-info").css("visibility","visible");
 }
 //#### end of tutorial ####//
 

@@ -91,11 +91,12 @@ h1 {
 #tut_btn_div{
     position: absolute;
     bottom:8vh;
-    left:47%;
+    width: 100%;
 }
 
 #tut_btn_done{
     background: #E0ECF5;
+    left: 47%;
 }
 
 #tut_icon{
