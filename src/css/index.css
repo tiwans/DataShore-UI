@@ -90,8 +90,8 @@ h1 {
 
 #tut_btn_div{
     position: absolute;
-    left: 50%;
-    bottom:4vh;
+    bottom:8vh;
+    left:47%;
 }
 
 #tut_btn_done{
@@ -105,12 +105,12 @@ h1 {
 
 #tut_img_1{
     position: absolute;
-    right: 0%;
-    top:40%;
+    left: 75%;
+    top:160px;
 }
 
 #tut_img_2{
     position: absolute;
     left: 3%;
-    top: 15%;
+    top: 70px;
 }

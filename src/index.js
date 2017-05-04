@@ -46,6 +46,9 @@ function showTut(){
     var tut_btn = '<button type="button" class="mdl-button mdl-button--fab" id="tut_btn_done" onClick="removeTut()"><i class="material-icons" id="tut_icon">clear</i></button>'
     $("#modal_tut").modal();
         $("#tut_leave").click(function(){
+            var tut_2_height = $(".process_bar").css('height');
+            console.log(tut_2_height);
+            $(".bs-wizard-info").css("visibility","hidden");
             var tut_btn_div = document.createElement('div');
             tut_btn_div.setAttribute('id','tut_btn_div');
             tut_btn_div.innerHTML = tut_btn;
