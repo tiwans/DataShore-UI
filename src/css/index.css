@@ -88,26 +88,29 @@ h1 {
     height: 100%;
 }
 
-#tut_done{
+#tut_btn_div{
     position: absolute;
     left: 50%;
     bottom:4vh;
-    background:#2767AE;;
+}
+
+#tut_btn_done{
+    background: #E0ECF5;
 }
 
 #tut_icon{
     font-size: 100%;
-    color: white;
+    color: #2767AE;
 }
 
 #tut_img_1{
     position: absolute;
-    right: 3%;
+    right: 0%;
     top:40%;
 }
 
 #tut_img_2{
     position: absolute;
     left: 3%;
-    top: 0;
+    top: 15%;
 }

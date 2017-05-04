@@ -42,26 +42,33 @@ function init(){
 
 //#### tutorial ####//
 function showTut(){
-    var tut_innerHTML='<div><img src="src/tut_1.1.png" alt="tutorial_1" id="tut_img_1"><img src="src/tut_2.png" alt="tutorial_2" id="tut_img_2"><button type="button" id="tut_done" class="mdl-button mdl-button--fab" onClick="removeTut()"><i class="material-icons" id="tut_icon">clear</i></button></div>';
+    var tut_innerHTML='<div><img src="src/tut_1.1.png" alt="tutorial_1" id="tut_img_1"><img src="src/tut_2.png" alt="tutorial_2" id="tut_img_2"></div>';
+    var tut_btn = '<button type="button" class="mdl-button mdl-button--fab" id="tut_btn_done" onClick="removeTut()"><i class="material-icons" id="tut_icon">clear</i></button>'
     $("#modal_tut").modal();
         $("#tut_leave").click(function(){
-            var tut_div = document.createElement('div');
-            tut_div.setAttribute('id','tutorial');
-            tut_div.innerHTML = tut_innerHTML;
-            var body = document.getElementById('container');
-            body.appendChild(tut_div);
-            document.getElementById('tutorial').innerHTML = tut_innerHTML;
+            var tut_btn_div = document.createElement('div');
+            tut_btn_div.setAttribute('id','tut_btn_div');
+            tut_btn_div.innerHTML = tut_btn;
+            var container = document.getElementById('container');
+            container.appendChild(tut_btn_div);
+            var body = document.getElementById('body');
+            var tut_descr_div = document.createElement('div');
+            tut_descr_div.setAttribute('id','tutorial');
+            tut_descr_div.innerHTML = tut_innerHTML;
+            body.appendChild(tut_descr_div);
     })
 }
 
 function removeTut(){
-    alert('click');
-    var tut_div = document.getElementById('tutorial');
-    tut_div.innerHTML = "";
-    var body = document.getElementById('container');
-    body.removeChild(tut_div);
+    alert('exit the tutorial');
+    var tut_descr_div = document.getElementById('tutorial');
+    tut_descr_div.innerHTML = "";
+    var body = document.getElementById('body');
+    body.removeChild(tut_descr_div);
+    var tut_btn_div = document.getElementById('tut_btn_div');
+    var container = document.getElementById('container');
+    container.removeChild(tut_btn_div);
 }
-
 //#### end of tutorial ####//
 
 //#### modal ####//
