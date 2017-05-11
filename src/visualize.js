@@ -56,9 +56,10 @@ dataRef.on('value', function(snapshot) {
             var temp = {
                 y: myObject['pressure'],
                 x: myObject['temperature'],
-                mode: 'markers',
+                mode: 'markers+lines',
                 type: 'scatter',
                 name: 'temperature',
+                line: {shape: 'spline'},
                 marker: { size: 5,
                         color: 'rgb(93, 164, 214)'},
             }
@@ -66,9 +67,10 @@ dataRef.on('value', function(snapshot) {
             var density = {
                 y: myObject['pressure'],
                 x: myObject['depth'],
-                mode: 'markers',
+                mode: 'markers+lines',
                 type: 'scatter',
                 name: 'density',
+                line: {shape: 'spline'},
                 marker: { 
                     size: 5,
                     color: 'rgb(255, 65, 54)',
@@ -79,9 +81,10 @@ dataRef.on('value', function(snapshot) {
             var salinity = {
                 y: myObject['pressure'],
                 x: myObject['salinity'],
-                mode: 'markers',
+                mode: 'markers+lines',
                 type: 'scatter',
                 name: 'salinity',
+                line: {shape: 'spline'},
                 marker: { 
                     size: 5,
                     color: 'rgb(44, 160, 101)',
@@ -99,7 +102,8 @@ dataRef.on('value', function(snapshot) {
                 yaxis: {
                     autorange: 'reversed',
                     title: 'pressure'},
-                height: 500
+                height: 700,
+                width:500
             };
              Plotly.newPlot('it_line_chart',dataset1,layout1);
 
@@ -199,17 +203,32 @@ dataRef.on('value', function(snapshot) {
                 });
                 $("#modal_next").click(function(){
                     $("#modal_next").prop("style","display:none");
+                    console.log("chart_type",chart_type);
                     $("#modal_next_next").prop("style","dispaly:block");
-                    $('#chart_input').prop("style","display:block");
                     $('#chart_type_preview').prop("style","display:none");
-                    $("#modal_next_next").click(function(){
-                        console.log("heat_map");
-                        if(chart_type=="heatmap"){
-                            console.log("heat_map!");
-                            create_heatmap(myObject["time"],myObject["pressure"],
-                            {"temperature":myObject["temperature"],"depth":myObject["depth"],"salinity":myObject["salinity"]},{"temperature":0,"depth":0,"salinity":0});
-                        }
-                    });
+                    if(chart_type=="scatter_plot"||chart_type=="line_chart"){
+                        $('#scatter_line').prop("style","display:block");
+                        $("#modal_next_next").click(function(){
+                            var x = [];
+                            var y_ary =[];
+                            $.each($(".var:checkbox:checked"), function(){   
+                                 console.log("clicked_create");
+                                var y = {"y":[],"color":[]};         
+                                // x_y["x"].push($(this).val());
+                                var $div = $(this).parent().parent();
+                                var $btn = $div.find(".jscolor");
+                                console.log($div.prop("class"));
+                                if($btn.css("visibility")=="hidden"){
+                                    x=myObject[$(this).val()];
+                                    console.log($(this).val(),x);
+                                }
+
+                            });
+                            // alert("My favourite sports are: " + favorite.join(", "));
+                            // create_scatter_line(myObject["time"],myObject["pressure"],
+                            // {"temperature":myObject["temperature"],"depth":myObject["depth"],"salinity":myObject["salinity"]},{"temperature":0,"depth":0,"salinity":0});
+                        });
+                    }
                 });
                 $(".modal_leave").click(function(){
                     $('#chart_sel_modal').prop("style","display:none");
@@ -262,6 +281,7 @@ function create_heatmap(x,y,z_ary,color_ary){
     }
 }
 
+//helper for heatmap
 function reorgZ_ary(array,column_length,row_length){
     console.log("reorgZ_ary called",row_length + " " + column_length + " " + array.length);
     var z_res=[];
@@ -271,3 +291,23 @@ function reorgZ_ary(array,column_length,row_length){
     }
     return z_res;
 }
+
+//* other code *//
+//sct_lin_varSel
+$('.sct_lin_axis_dp ul.dropdown-menu li a').click(function (e) {
+    var $div = $(this).parent().parent().parent(); 
+    var $pdiv = $(this).parent().parent().parent().parent(); 
+    var $pbtn = $pdiv.find(".jscolor");
+    var $btn = $div.find('button');
+    $btn.html($(this).text() + ' <span class="caret"></span>');
+    $div.removeClass('open');
+    if($(this).text()=="X"){
+        $pbtn.css("visibility","hidden");
+        console.log($pbtn.css("visibility"));
+    }else{
+         $pbtn.css("visibility","visible");
+         console.log($pbtn.css("visibility"));
+    }
+    e.preventDefault();
+    return false;
+});

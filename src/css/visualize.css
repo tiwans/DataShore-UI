@@ -27,6 +27,7 @@
     margin-left: 3vh;
     margin-right: 2vh;
 }
+
 /* chart page */
 .mdl-layout__content{
     position: relative;
@@ -42,3 +43,7 @@
     display: inline-block;
 }
 
+.input-group-addon{
+    width: 100px;
+    height: 100px;
+}
