@@ -1,5 +1,5 @@
 data,,,
-pressure,temperature,depth,salinity
+pressure,temperature,density,salinity
 1,7.794175,7.551825,7.888457143
 2,7.91367619,7.65485,8.846057143
 3,8.329940909,9.3631125,10.11247143

@@ -66,7 +66,7 @@ dataRef.on('value', function(snapshot) {
 
             var density = {
                 y: myObject['pressure'],
-                x: myObject['depth'],
+                x: myObject['density'],
                 mode: 'markers+lines',
                 type: 'scatter',
                 name: 'density',
@@ -192,6 +192,7 @@ dataRef.on('value', function(snapshot) {
                 var chart_type;
                 $('#add_chart_btn').on('click',function(){
                     $('#chart_sel_modal').prop("style","display:block");
+                    $("#modal_next_next").prop("style","dispaly:none");
                 });
                 $('.list-group-item').click(function() {
                     $("#modal_next_next").prop("style","dispaly:none");
