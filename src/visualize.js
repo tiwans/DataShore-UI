@@ -66,7 +66,7 @@ dataRef.on('value', function(snapshot) {
 
             var density = {
                 y: myObject['pressure'],
-                x: myObject['depth'],
+                x: myObject['density'],
                 mode: 'markers+lines',
                 type: 'scatter',
                 name: 'density',
