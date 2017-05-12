@@ -210,23 +210,21 @@ dataRef.on('value', function(snapshot) {
                         $('#scatter_line').prop("style","display:block");
                         $("#modal_next_next").click(function(){
                             var x = [];
-                            var y_ary =[];
+                            var y =[];
                             $.each($(".var:checkbox:checked"), function(){   
-                                 console.log("clicked_create");
-                                var y = {"y":[],"color":[]};         
+                                console.log("clicked_create", $(this).val());     
                                 // x_y["x"].push($(this).val());
                                 var $div = $(this).parent().parent();
                                 var $btn = $div.find(".jscolor");
                                 console.log($div.prop("class"));
                                 if($btn.css("visibility")=="hidden"){
-                                    x=myObject[$(this).val()];
-                                    console.log($(this).val(),x);
+                                    x=myObject[""+$(this).val()];
                                 }
-
+                                if($btn.css("visibility")!="hidden"){
+                                    y=myObject[""+$(this).val()]
+                                }
                             });
-                            // alert("My favourite sports are: " + favorite.join(", "));
-                            // create_scatter_line(myObject["time"],myObject["pressure"],
-                            // {"temperature":myObject["temperature"],"depth":myObject["depth"],"salinity":myObject["salinity"]},{"temperature":0,"depth":0,"salinity":0});
+                            create_scatter_line(x,y,chart_type);
                         });
                     }
                 });
@@ -290,6 +288,41 @@ function reorgZ_ary(array,column_length,row_length){
         console.log(i,z_res[i].length);
     }
     return z_res;
+}
+
+function create_scatter_line(x,y,chart_type){
+    var parent_div=document.getElementById("page_content_chart");
+    var child_div = document.createElement("div");
+    console.log(x);
+    console.log(y);
+    if(chart_type=="scatter_plot"){
+        var trace1 = {
+            x: x,
+            y: y,
+            mode: 'markers'
+        };
+        var layout = {
+            title: ""+chart_type,
+            height: 400,
+            width: 400
+        }
+        Plotly.newPlot(child_div,[trace1]);
+        child_div.setAttribute("class","scatter");
+    }else{
+        var trace1 = {
+            x: x,
+            y: y,
+            type: 'markers+lines'
+        };
+        var layout = {
+            title: ""+chart_type,
+            height: 400,
+            width: 400
+        }
+        Plotly.newPlot(child_div,[trace1]);
+        child_div.setAttribute("class","line");
+    }
+    parent_div.appendChild(child_div);
 }
 
 //* other code *//
