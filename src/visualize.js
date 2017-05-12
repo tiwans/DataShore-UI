@@ -209,8 +209,8 @@ dataRef.on('value', function(snapshot) {
                     if(chart_type=="scatter_plot"||chart_type=="line_chart"){
                         $('#scatter_line').prop("style","display:block");
                         $("#modal_next_next").click(function(){
-                            var x = [];
-                            var y =[];
+                            var x = {};
+                            var y ={};
                             $.each($(".var:checkbox:checked"), function(){   
                                 console.log("clicked_create", $(this).val());     
                                 // x_y["x"].push($(this).val());
@@ -218,10 +218,12 @@ dataRef.on('value', function(snapshot) {
                                 var $btn = $div.find(".jscolor");
                                 console.log($div.prop("class"));
                                 if($btn.css("visibility")=="hidden"){
-                                    x=myObject[""+$(this).val()];
+                                    // x=myObject[""+$(this).val()];
+                                    x[""+$(this).val()]=myObject[""+$(this).val()]
                                 }
                                 if($btn.css("visibility")!="hidden"){
-                                    y=myObject[""+$(this).val()]
+                                    // y=myObject[""+$(this).val()]
+                                    y[""+$(this).val()]=myObject[""+$(this).val()]
                                 }
                             });
                             create_scatter_line(x,y,chart_type);
@@ -293,8 +295,8 @@ function reorgZ_ary(array,column_length,row_length){
 function create_scatter_line(x,y,chart_type){
     var parent_div=document.getElementById("page_content_chart");
     var child_div = document.createElement("div");
-    console.log(x);
-    console.log(y);
+    console.log(x.val());
+    console.log(y.val());
     if(chart_type=="scatter_plot"){
         var trace1 = {
             x: x,
@@ -302,10 +304,15 @@ function create_scatter_line(x,y,chart_type){
             mode: 'markers'
         };
         var layout = {
-            title: ""+chart_type,
-            height: 400,
-            width: 400
-        }
+            title:""+chart_type,
+            xaxis: {
+                side: 'top',
+                title: "salinity"},
+            yaxis: {
+                autorange: 'reversed',
+                title: 'pressure'},
+            height: 500
+        };
         Plotly.newPlot(child_div,[trace1]);
         child_div.setAttribute("class","scatter");
     }else{
