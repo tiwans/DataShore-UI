@@ -28,7 +28,7 @@ var database = firebase.database();
 var create_project = "<div class='home panel' id='create_project'><div class='panel-heading'><h2 class='panel-title'>Create Project</h2></div><div class='panel-body'>Name your project<div class='input-group project_name'><span class='input-group-addon' id='sizing-addon2'>Name</span><input type='text' class='form-control' placeholder='Project Name' aria-describedby='sizing-addon2' id='project_name'></div><button type='button' class='btn btn-default stg_btn' onClick=creatPro()>Create</button></div></div>";
 var select_var = '<div class="home panel" id="variable-select"><div class="panel-heading"><h2 class="panel-title">Select Variable</h2></div><div class="panel-body">Choose a varibale to predict!</div><div><select id="varSelect" class="dropdown" onchange="selectVar(event)"><option value="">---</option><option value="salinity">Salinity</option><option value="temperature">Temperature</option><option value="density">Density</option><option value="other">Other</option></select></div></div> <div class="home panel" id="variable-require"><div class="panel-heading"><h2 class="panel-title">Prepare to Upload your Data</h2></div><div class="panel-body">The required varables needed to predict</div><div><p id="variable-require-result"></p></div></div>';
 var upload_data = "<div class='home panel' id='upload_data'><div class='panel-heading'><h2 class='panel-title'>Upload Data</h2></div><div class='panel-body'>Choose the file to uploadupload_data<input type='file' name='File Upload' id='txtFileUpload' onChange='browse(event)' accept='.csv'/><button type='button' class='btn btn-default stg_btn' onClick='upload()'>Upload</button></div></div>";
-var output_dt="<div class='home panel' id='output_dt'><div class='panel-heading'><h2 class='panel-title'>View Output</h2></div><div class='panel-body'><div id=table_div'><table class='table table-striped' id='output_table'></table></div><button type='button' class='btn btn-default stg_btn' onClick=download()>Download Output</button></div></div>"
+var output_dt="<div class='home panel' id='output_dt'><div class='panel-heading'><h2 class='panel-title'>View Output</h2></div><div class='panel-body'><div id=table_div'><table class='table table-striped' id='output_table'></table></div><button type='button' class='btn btn-default stg_btn' onClick=download()>Download Output and Exit</button><a href='/src/visualize.html' type='button' class='btn btn-default'>Continue to Dashboard</a></div></div>"
 
 //##############End of Different Process Stage###########//
 init();
@@ -113,7 +113,7 @@ function rollback(clicked_id){
     }
 }
 
-
+// create project
 function creatPro(){
     project_name = document.getElementById('project_name').value;
     document.getElementById('stage_content').innerHTML = select_var;
@@ -122,8 +122,10 @@ function creatPro(){
     document.getElementById("select_var_stg").classList.remove('disabled');
     document.getElementById("select_var_stg").classList.add("active");
     stg_count=0;
+    sessionStorage.setItem('project_name', project_name);
 }
 
+//select var
 function selectVar(evt){
     console.log("selectVar")
      evt.preventDefault();
@@ -157,6 +159,7 @@ function selectVar(evt){
     }
 }
 
+//download tempload before upload
 function startUpload(){
     // Method that checks that the browser supports the HTML5 File API
     downloadTemplate(template_var);
@@ -167,6 +170,7 @@ function startUpload(){
     document.getElementById('stage_content').innerHTML=upload_data;
     stg_count++;
 }
+
 
 function browserSupportFileUpload() {
     var isCompatible = false;
@@ -186,6 +190,7 @@ function browse(evt) {
     }   
 }
 
+//upload the file
 function upload(){
     var reader = new FileReader();
     reader.readAsText(file);
@@ -263,7 +268,6 @@ function download(){
 function downloadTemplate(template_var){
     var csvContent = "data:text/csv;charset=utf-8,";
     var output = [['data'],template_var];
-
     output.forEach(function(infoArray, index){
         console.log(infoArray);
         var dataString = infoArray.join(",");

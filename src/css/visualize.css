@@ -1,0 +1,49 @@
+/* page format */
+#page-content{
+    display: flex;
+}
+
+#page_content_nav{
+    text-align: center;
+}
+
+#add_chart_btn{
+    position: relative;
+    width: 80%;
+    background-color:lightblue;
+    border-radius: 10px;
+    margin-left: 5%;
+    margin-right: 5%;
+}
+
+/* profile page */
+#line_switch{
+    display: flex;
+    justify-content: center;
+}
+#line_switch label{
+    display: flex;
+    width: 5%;
+    margin-left: 3vh;
+    margin-right: 2vh;
+}
+
+/* chart page */
+.mdl-layout__content{
+    position: relative;
+}
+
+#chart_sel_modal{
+    position: absolute;
+    top: 20%;
+    left: 20%;
+}
+
+.heatmap{
+    display: inline-block;
+}
+
+.input-group-addon{
+    width: 100px;
+    height: 100px;
+}

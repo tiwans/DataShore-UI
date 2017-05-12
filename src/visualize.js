@@ -1,195 +1,313 @@
 "use strict";
 
-drawPannel();
+//############## Initialize ##############//
+var project_name=sessionStorage.getItem("project_name")
+var config = {
+    apiKey: "AIzaSyANfwhjv-oRcJhVp6sQfArTorgh4jsZFJw",
+    authDomain: "datashore-7057d.firebaseapp.com",
+    databaseURL: "https://datashore-7057d.firebaseio.com",
+    projectId: "datashore-7057d",
+    storageBucket: "datashore-7057d.appspot.com",
+    messagingSenderId: "352958906618"
+  };
+firebase.initializeApp(config);
+var database = firebase.database();
+console.log(project_name);
+var output_res=[];
+var dataRef = database.ref('project/' + project_name);
+var pro_content = document.getElementById("page_content_profile");
+var chart_content = document.getElementById("page_content_chart");
+var static_content = document.getElementById("page_content_static");
+chart_content.setAttribute("style","display:none");
+static_content.setAttribute("style","display:none");
+//############## End of Initialize ##############//
 
-function drawPannel(){
-    d3.csv('transactions.csv', function(error, data){
-  	window.data = data;
-    console.log(data);
+dataRef.on('value', function(snapshot) {
+    snapshot.forEach(function(child) {
+        //find the file and parse it into map//
+        if(child.key == 'Uploaded_File'){
+            output_res = child.val();
+            output_res = $.csv.toArrays(output_res);
+            output_res = output_res.slice(1);
+            var lineArray = [];
+            output_res.forEach(function(infoArray, index){
+                var dataString = infoArray.join(",");
+                lineArray.push(dataString);
+            }); 
+            var csvContent = lineArray.join("\n");
+            var data= d3.csv.parse(csvContent);
+            var headers = d3.keys(data[0]);
+            var myObject = {};
+            headers.forEach(function(d) {
+                myObject[d] = [];
+            });
+            data.forEach(function(d) {
+                for (var key in d) {
+                    myObject[key].push(d[key]);
+                }
+            });
+            window.data=myObject;
+            console.log(window.data);
+        //end of parsing//
 
-    // This function should help you format your data: lifted from the Plotly bubble map example:
-    function unpack(rows, key) {
-      return rows.map(function(row) { return row[key]; });
-    };
+////############## Start of  of Profolie ##############//
+//################                       ##############//
+//############## Start of  of Line Chart ##############//
+            var temp = {
+                y: myObject['pressure'],
+                x: myObject['temperature'],
+                mode: 'markers+lines',
+                type: 'scatter',
+                name: 'temperature',
+                line: {shape: 'spline'},
+                marker: { size: 5,
+                        color: 'rgb(93, 164, 214)'},
+            }
 
-    //scatter plot
-    var trace1 = {
-    	y: unpack(data, 'Penicilin'),
-    	x: unpack(data, 'Bacteria '),
-    	mode: 'markers+lines',
-    	type: 'scatter',
-    	name: 'Penicilin',
-    	text: unpack(data, 'Penicilin'),
-    	marker: { size: 15,
-    			color: 'rgb(93, 164, 214)'},
-    };
+            var density = {
+                y: myObject['pressure'],
+                x: myObject['depth'],
+                mode: 'markers+lines',
+                type: 'scatter',
+                name: 'density',
+                line: {shape: 'spline'},
+                marker: { 
+                    size: 5,
+                    color: 'rgb(255, 65, 54)',
+                    sizeref: 2,
+                    symbol: 'square'},
+            };
 
-    var trace2 = {
-    	y: unpack(data, 'Streptomycin '),
-    	x: unpack(data, 'Bacteria '),
-    	mode: 'markers+lines',
-    	type: 'scatter',
-    	name: 'Streptomycin',
-    	text: unpack(data, 'Streptomycin '),
-    	marker: { 
-    		size: 15,
-    		color: 'rgb(255, 65, 54)',
-    		sizeref: 2,
-            symbol: 'square'},
-    };
+            var salinity = {
+                y: myObject['pressure'],
+                x: myObject['salinity'],
+                mode: 'markers+lines',
+                type: 'scatter',
+                name: 'salinity',
+                line: {shape: 'spline'},
+                marker: { 
+                    size: 5,
+                    color: 'rgb(44, 160, 101)',
+                    sizeref: 2,
+                    symbol: 'diamond'},
+            };
 
-    var trace3 = {
-    	y: unpack(data, 'Neomycin'),
-    	x: unpack(data, 'Bacteria '),
-    	mode: 'markers+lines',
-    	type: 'scatter',
-    	name: 'Neomycin',
-    	text: unpack(data, 'Neomycin'),
-    	marker: { 
-    		size: 15,
-    		color: 'rgb(44, 160, 101)',
-            sizeref: 2,
-            symbol: 'diamond'},
-    };
+            //intergrated line chart--default//
+            var dataset1 =[temp,density,salinity];
+            var layout1 = {
+                title:'Basic Profile',
+                xaxis: {
+                    side: 'top',
+                    title: headers.toString()},
+                yaxis: {
+                    autorange: 'reversed',
+                    title: 'pressure'},
+                height: 700,
+                width:500
+            };
+             Plotly.newPlot('it_line_chart',dataset1,layout1);
 
-    var dataset1 =[trace1,trace2,trace3];
+             //seperated line chart
+            var temp_layout = {
+                title:'Basic Profile',
+                xaxis: {
+                    side: 'top',
+                    title: "temperature"},
+                yaxis: {
+                    autorange: 'reversed',
+                    title: 'pressure'},
+                height: 500
+            };
+            var density_layout = {
+                title:'Basic Profile',
+                xaxis: {
+                    side: 'top',
+                    title: "density"},
+                yaxis: {
+                    autorange: 'reversed',
+                    title: 'pressure'},
+                height: 500
+            };
+            var salinity_layout = {
+                title:'Basic Profile',
+                xaxis: {
+                    side: 'top',
+                    title: "salinity"},
+                yaxis: {
+                    autorange: 'reversed',
+                    title: 'pressure'},
+                height: 500
+            };
+            Plotly.newPlot('temp',[temp],temp_layout);
+            Plotly.newPlot('density',[density],density_layout);
+            Plotly.newPlot('salinity',[salinity],salinity_layout);
+            var it_line_chart = document.getElementById("it_line_chart");
+            var sp_line_chart = document.getElementById("sp_line_chart");
+            sp_line_chart.setAttribute("style","display:none");
+            //switch between intergrated and seperated chart
+            $(".mdl-switch__input").click(function(){
+                var checked=$(this).prop('checked');
+                if (checked){
+                    it_line_chart.setAttribute("style","display:block");
+                    sp_line_chart.setAttribute("style","display:none");
+                }else{
+                    it_line_chart.setAttribute("style","display:none");
+                    sp_line_chart.setAttribute("style","display:block");
+                }
+            })
+////############## End of  of Line Chart ##############//
+//################+++++++++++++++++++++################//
+//############## End of the Porfolie ##############//
 
-    var layout1 = {
-    	title:'Effecness of Different Antibotic',
-    	height: 800,
-    	width: 950
-    };
+////############## Start of the Chart ##############//
+//################                    ################//
+//############## Start of the personalize chart ##############//
+            $("#nav_pro").click(function(){
+                pro_content.setAttribute("style","display:block");
+                static_content.setAttribute("style","display:none");
+                chart_content.setAttribute("style","display:none");
+                $("#nav_pro").prop("class","active");
+                $("#nav_chart").prop("class","abled");
+                $("#nav_static").prop("class","abled");
+            })
+            $("#nav_chart").click(function(){
+                chart_content.setAttribute("style","display:block");
+                pro_content.setAttribute("style","display:none");
+                static_content.setAttribute("style","display:none");
+                $("#nav_chart").prop("class","active");
+                $("#nav_pro").prop("class","abled");
+                 $("#nav_static").prop("class","abled");
+                display_chart();
+            })
+            $("#nav_static").click(function(){
+                static_content.setAttribute("style","display:block");
+                chart_content.setAttribute("style","display:none");
+                pro_content.setAttribute("style","display:none");
+                $("#nav_static").prop("class","active");
+                $("#nav_pro").prop("class","abled");
+                $("#nav_chart").prop("class","abled");
+            })
+            function display_chart(){
+                // chart_content.innerHTML="<p>hello</p>";
+                var chart_type;
+                $('#add_chart_btn').on('click',function(){
+                    $('#chart_sel_modal').prop("style","display:block");
+                });
+                $('.list-group-item').click(function() {
+                    $("#modal_next_next").prop("style","dispaly:none");
+                    $("#modal_next").prop("style","display:block");
+                    $('#chart_input').prop("style","display:none");
+                    $('#chart_type_preview').prop("style","display:block");
+                    $("#chart_img_src").prop("src","./img/" +$(this).prop("id")+".png");
+                    chart_type = $(this).prop("id");
+                });
+                $("#modal_next").click(function(){
+                    $("#modal_next").prop("style","display:none");
+                    console.log("chart_type",chart_type);
+                    $("#modal_next_next").prop("style","dispaly:block");
+                    $('#chart_type_preview').prop("style","display:none");
+                    if(chart_type=="scatter_plot"||chart_type=="line_chart"){
+                        $('#scatter_line').prop("style","display:block");
+                        $("#modal_next_next").click(function(){
+                            var x = [];
+                            var y_ary =[];
+                            $.each($(".var:checkbox:checked"), function(){   
+                                 console.log("clicked_create");
+                                var y = {"y":[],"color":[]};         
+                                // x_y["x"].push($(this).val());
+                                var $div = $(this).parent().parent();
+                                var $btn = $div.find(".jscolor");
+                                console.log($div.prop("class"));
+                                if($btn.css("visibility")=="hidden"){
+                                    x=myObject[$(this).val()];
+                                    console.log($(this).val(),x);
+                                }
 
-    Plotly.newPlot('part1',dataset1,layout1);
+                            });
+                            // alert("My favourite sports are: " + favorite.join(", "));
+                            // create_scatter_line(myObject["time"],myObject["pressure"],
+                            // {"temperature":myObject["temperature"],"depth":myObject["depth"],"salinity":myObject["salinity"]},{"temperature":0,"depth":0,"salinity":0});
+                        });
+                    }
+                });
+                $(".modal_leave").click(function(){
+                    $('#chart_sel_modal').prop("style","display:none");
+                })
+            }
+        }
+    });
+});
 
-    //scatter plot about antibotic related to Gram Staining
-    var preload = {
-    	pn: unpack(data, 'Gram Staining '),
-    	bac: unpack(data, 'Bacteria '),
-    	n: unpack(data, 'Neomycin'),
-    	s: unpack(data, 'Streptomycin '),
-    	p: unpack(data, 'Penicilin')
-    };
+//take in para: 
+//@x:array || @y:array ||@z_ary: dict,object ||@color_ary: dict,object
+function create_heatmap(x,y,z_ary,color_ary){
+    console.log(x,y,z_ary,color_ary);
+    var parent_div=document.getElementById("page_content_chart");
+    var map_var_count=Object.keys(z_ary).length;
+    var column_length=4; //x.length;
+    var row_length=9; //y.length;
+    console.log(column_length);
+    for(var i=0; i <map_var_count; i++){
+        var child_div = document.createElement("div");
+        child_div.setAttribute("class","heatmap");
+        var z = reorgZ_ary(z_ary[Object.keys(z_ary)[i]],column_length,row_length);
+        //x: time
+        var xValues = [1,2,3,4];
+        //y: pressure
+        var yValues = [1,2,3,4,5,6,7,8,9];
 
-    var pos = [];
-    var neg = [];
-    for (var i=0; i<4;i++){
-    	neg[i] = [];
-    };
-    for (var i=0; i<4;i++){
-    	pos[i] = [];
-    };
-
-    for(var i=0; i<preload["pn"].length; i++){
-    	if(preload["pn"][i] == "negative"){
-            neg[0].push(preload["bac"][i]);
-            neg[1].push(preload["p"][i]);
-    		neg[2].push(preload["n"][i]);
-    		neg[3].push(preload["s"][i]);
-    	}else{
-    		pos[0].push(preload["bac"][i]);
-    		pos[1].push(preload["p"][i]);
-    		pos[2].push(preload["n"][i]);
-    		pos[3].push(preload["s"][i]);
-    	}
-    };
-
-
-    var negativeP ={
-    	x: neg[0],
-    	y: neg[1],
-    	type: 'bar',
-    	name: 'Penicilin',
-    	text: neg[1],
-    	textposition: 'bottom center'
-    };
-
-    var negativeN ={
-    	x: neg[0],
-    	y: neg[2],
-    	type: 'bar',
-    	name: 'Neomycin',
-    	text: neg[2],
-    	textposition: 'bottom center'
-    };
-
-    var negativeS ={
-    	x: neg[0],
-    	y: neg[3],
-    	type: 'bar',
-    	name: 'Streptomycin',
-    	text: neg[3],
-    	textposition: 'bottom center'
-    };
-
-    var dataset2 = [negativeP,negativeN,negativeS];
-
-    var layout2 = {
-        title:'Effecness of Different Antibotic to negative bacteria',
-        height: 800,
-        width: 950,
-    };
-
-    //document.getElementById('part2').innerHTML=neg[3];
-    Plotly.newPlot('part2',dataset2,layout2);
-
-
-
-    //penicillin related to positive and negative
-    var lpositiveP ={
-        x: pos[0],
-        y: pos[1],
-        type: 'scatter',
-        mode: 'markers',
-        name: 'positive',
-        marker: { 
-            size: 15,
-            sizeref: 2,
-            color: "purple"},
-    };
-
-    var lnegativeP ={
-    	x: neg[0],
-    	y: neg[1],
-    	type: 'scatter',
-    	mode: 'markers',
-    	name: 'negative',
-        marker: { 
-            size: 15,
-            sizeref: 2,
-            color: "pink"},	
-    };
-    var layout3 = {
-        title:'Effecness of Penicillin to Different Bacteria',
-        height: 800,
-        width: 950
-    };
-
-
-    var dataset3 =[lnegativeP,lpositiveP]
-    Plotly.newPlot('part3',dataset3,layout3);
-
-  });
+        var zValues = z
+        console.log(xValues.length,yValues.length,zValues);
+        var data = [{
+                x: xValues,
+                y: yValues,
+                z: zValues,
+                type: 'heatmap'
+            }];
+        var layout = {
+            title: Object.keys(z_ary)[i] + " Heatmap",
+            xaxis: {
+                title: "time",
+                side: 'right'
+            },
+            yaxis: {
+                title:"pressure"
+            },
+            height: 400,
+            width: 400
+        }
+        Plotly.newPlot(child_div, data, layout);
+        parent_div.appendChild(child_div);
+    }
 }
 
-// document.getElementById("download").addEventListener("click", download());
-
-function download(){
-    var data = [["name1", "city1", "some other info"], ["name2", "city2", "more info"]];
-    var csvContent = "data:text/csv;charset=utf-8,";
-    data.forEach(function(infoArray, index){
-        alert(infoArray);
-        var dataString = infoArray.join(",");
-        
-        csvContent += index < data.length ? dataString+ "\n" : dataString;
-
-    }); 
-
-    var encodedUri = encodeURI(csvContent);
-    var link = document.createElement("a");
-    link.setAttribute("href", encodedUri);
-    link.setAttribute("download", "my_data.csv");
-    document.body.appendChild(link); // Required for FF
-
-    link.click();
+//helper for heatmap
+function reorgZ_ary(array,column_length,row_length){
+    console.log("reorgZ_ary called",row_length + " " + column_length + " " + array.length);
+    var z_res=[];
+    for (var i=0; i<row_length; i++) {
+        z_res[i] = array.slice(i*column_length,(i+1)*column_length);
+        console.log(i,z_res[i].length);
+    }
+    return z_res;
 }
+
+//* other code *//
+//sct_lin_varSel
+$('.sct_lin_axis_dp ul.dropdown-menu li a').click(function (e) {
+    var $div = $(this).parent().parent().parent(); 
+    var $pdiv = $(this).parent().parent().parent().parent(); 
+    var $pbtn = $pdiv.find(".jscolor");
+    var $btn = $div.find('button');
+    $btn.html($(this).text() + ' <span class="caret"></span>');
+    $div.removeClass('open');
+    if($(this).text()=="X"){
+        $pbtn.css("visibility","hidden");
+        console.log($pbtn.css("visibility"));
+    }else{
+         $pbtn.css("visibility","visible");
+         console.log($pbtn.css("visibility"));
+    }
+    e.preventDefault();
+    return false;
+});
