@@ -59,13 +59,16 @@ var signUpForm = document.getElementById("signup-form");
 var emailInput = document.getElementById("email-input");
 var passwordInput = document.getElementById("password-input");
 var displayNameInput = document.getElementById("display-name-input");
-console.log("called");
 
 authenticateUser();
 
-signUpForm.addEventListener("submit", function(evt) {
-    console.log("get started");
-    evt.preventDefault();
+$("#signup_submit").on("click",function(){
+   signup();
+})
+
+// signUpForm.addEventListener("submit", function() {
+function signup(){
+    console.log("get started",emailInput.val);
 
 
     firebase.auth().createUserWithEmailAndPassword(emailInput.value, passwordInput.value)
@@ -75,12 +78,12 @@ signUpForm.addEventListener("submit", function(evt) {
             });
         })
         .then(function() {
-            window.location = "index.html";
+            window.location.href = "/";
         })
         .catch(function(err) {
             alert(err.message);
         });
-});
+}
 
 
 function authenticateUser(){
@@ -88,41 +91,33 @@ function authenticateUser(){
         console.log("authentication called");
         if (currUser) {
             // User is signed in.
-            window.location.href = "index.html";
+            window.location.href = "/";
         }
     });
 }
-
 //* ############ END OF SIGN UP FORM ############ *//
 
 
 //* ############ SIGN IN FORM ############ *//
-// var signUpForm = document.getElementById("signin-form");
-// var emailInput = document.getElementById("email-input");
-// var passwordInput = document.getElementById("password-input");
+var signInForm = document.getElementById("signin-form");
+var in_emailInput = document.getElementById("in_email-input");
+var in_passwordInput = document.getElementById("in_password-input");
 
-// authenticateUser();
+$("#signin_submit").on("click",function(){
+    console.log("get started",in_emailInput.val);
+    signin();
+})
 
-// signUpForm.addEventListener("submit", function(evt) {
-//     evt.preventDefault();
+function signin(){
+    console.log("get started",in_emailInput.val);
+    firebase.auth().signInWithEmailAndPassword(in_emailInput.value, in_passwordInput.value)
+        .then(function() {
+            window.location = "/";
+        })
+        .catch(function(err) {
+            alert(err.message);
+        });
+}
 
-//   	if (passwordInput.value.length > 5) {
-// 	    firebase.auth().signInWithEmailAndPassword(emailInput.value, passwordInput.value)
-// 	        .then(function() {
-// 	            window.location = "index.html";
-// 	        })
-// 	        .catch(function(err) {
-// 	            alert(err.message);
-// 	        });
-// 	    return false;
-// 	}
-// });
 
-// function authenticateUser(){
-//     firebase.auth().onAuthStateChanged(function(currUser) {
-//         if (currUser) {
-//             // User is signed in.
-//             window.location.href = "index.html";
-//         }
-//     });
-// }
+

@@ -25,7 +25,7 @@
         <div id="signup">   
           <h1>Sign Up for Free</h1>
           
-          <forms id="signup-form">
+          <forms id="signup-form" onsubmit="signup()">
           
             <div class="top-row">
               <div class="field-wrap">
@@ -36,10 +36,6 @@
               </div>
           
               <div class="field-wrap">
-                <!--<label>
-                  Last Name<span class="req">*</span>
-                </label>
-                <input type="text"required autocomplete="off"/>-->
               </div>
             </div>
 
@@ -57,7 +53,7 @@
               <input type="password"required autocomplete="off" id="password-input"/>
             </div>
           
-          <button type="submit" class="button button-block"/>Get Started</button>
+          <button type="submit" class="button button-block" id="signup_submit"/>Get Started</button>
           
           </form>
 
@@ -66,25 +62,25 @@
         <div id="login">   
           <h1>Welcome Back!</h1>
           
-          <form action="/" method="post">
+          <form id="signin-form" onsubmit=="signin()">
           
             <div class="field-wrap">
             <label>
               Email Address<span class="req">*</span>
             </label>
-            <input type="email"required autocomplete="off"/>
+            <input type="email"required autocomplete="off" id="in_email-input"/>
           </div>
           
           <div class="field-wrap">
             <label>
               Password<span class="req">*</span>
             </label>
-            <input type="password"required autocomplete="off"/>
+            <input type="password"required autocomplete="off" id="in_password-input"/>
           </div>
           
           <p class="forgot"><a href="#">Forgot Password?</a></p>
           
-          <button class="button button-block"/>Log In</button>
+          <button type="button" class="button button-block" id="signin_submit"/>Log In</button>
           
           </form>
 
