@@ -1,6 +1,7 @@
 "use strict";
 
 // init variables
+var USER; // the current user
 var stage_content = document.getElementById('stage_content');
 var project_name;
 var stg_count=0;
@@ -24,6 +25,21 @@ var config = {
   };
 firebase.initializeApp(config);
 var database = firebase.database();
+//############## Authentication User ##############//
+authenticateUser();
+function authenticateUser(){
+    firebase.auth().onAuthStateChanged(function(currUser) {
+        if (currUser) {
+            // User is signed in.
+            USER = currUser;
+            console.log(USER.displayName);
+        } else {
+            // No user is signed in.
+            window.location.href = "src/signin.html";
+        }
+    });
+}
+
 //##############Different Process Stage###########//
 var create_project = "<div class='home panel' id='create_project'><div class='panel-heading'><h2 class='panel-title'>Create Project</h2></div><div class='panel-body'>Name your project<div class='input-group project_name'><span class='input-group-addon' id='sizing-addon2'>Name</span><input type='text' class='form-control' placeholder='Project Name' aria-describedby='sizing-addon2' id='project_name'></div><button type='button' class='btn btn-default stg_btn' onClick=creatPro()>Create</button></div></div>";
 var select_var = '<div class="home panel" id="variable-select"><div class="panel-heading"><h2 class="panel-title">Select Variable</h2></div><div class="panel-body">Choose a varibale to predict!</div><div><select id="varSelect" class="dropdown" onchange="selectVar(event)"><option value="">---</option><option value="salinity">Salinity</option><option value="temperature">Temperature</option><option value="density">Density</option><option value="other">Other</option></select></div></div> <div class="home panel" id="variable-require"><div class="panel-heading"><h2 class="panel-title">Prepare to Upload your Data</h2></div><div class="panel-body">The required varables needed to predict</div><div><p id="variable-require-result"></p></div></div>';
@@ -33,10 +49,17 @@ var output_dt="<div class='home panel' id='output_dt'><div class='panel-heading'
 //##############End of Different Process Stage###########//
 init();
 
-
+   
 //#### init ####//
 function init(){
     stage_content.innerHTML = create_project;
+    $("#signout").click(function(){
+            firebase.auth().signOut().then(function() {
+                window.location.href = "signin.html";
+            }, function(error) {
+                console.error('Sign Out Error', error);
+            });
+        });
 }
 
 

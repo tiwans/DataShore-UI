@@ -43,6 +43,10 @@
     display: inline-block;
 }
 
+.scatter{
+    display: inline-block;
+}
+
 .input-group-addon{
     width: 100px;
     height: 100px;

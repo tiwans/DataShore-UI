@@ -12,8 +12,9 @@
         <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
         <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
         <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
-        <script src="https://d3js.org/d3.v4.min.js"></script>
+        <!--<script src="https://d3js.org/d3.v4.min.js"></script>-->
         <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.4.11/d3.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/chroma-js/1.3.3/chroma.min.js"></script>
         <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
 	</head>
 	
@@ -106,26 +107,38 @@
                                             <div id="opt_var">
                                                 Customize Variables
                                                 <div class="input-group-addon">
-                                                    <label><input type="checkbox" class="var" value="density" aria-label="...">
+                                                    <label><input type="checkbox" class="var"
+                                                    value="density" aria-label="...">
                                                     density</label></br>
-                                                    <button type="button" class="btn btn-default jscolor {onFineChange:'update(this)'}" id="sct_lin_density_btn">Pick Color</button>
+                                                    <button type="button" class="btn btn-default
+                                                    jscolor"
+                                                    id="sct_lin_density_btn">Pick Color</button>
                                                     <div class="sct_lin_axis_dp dropdown">
-                                                        <button class="btn btn-primary dropdown-toggle" type="button" data-toggle="dropdown">Axis
+                                                        <button class="btn btn-primary
+                                                        dropdown-toggle" type="button"
+                                                        data-toggle="dropdown">Axis
                                                         <span class="caret"></span></button>
                                                         <ul class="dropdown-menu">
+                                                            <li><a href="#">--</a></li>
                                                             <li><a href="#">X</a></li>
                                                             <li><a href="#">Y</a></li>
                                                         </ul>
                                                     </div>
                                                 </div>
                                                 <div class="input-group-addon">
-                                                    <label><input type="checkbox" class="var" value="salinity" aria-label="...">
+                                                    <label><input type="checkbox" class="var"
+                                                    value="salinity" aria-label="...">
                                                     salinity</label></br>
-                                                    <button type="button" class="btn btn-default jscolor {onFineChange:'update(this)'}">Pick Color</button>
+                                                    <button type="button" class="btn btn-default
+                                                    jscolor">Pick
+                                                    Color</button>
                                                     <div class="sct_lin_axis_dp dropdown">
-                                                        <button class="btn btn-primary dropdown-toggle" type="button" data-toggle="dropdown">Axis
+                                                        <button class="btn btn-primary
+                                                        dropdown-toggle" type="button"
+                                                        data-toggle="dropdown">Axis
                                                         <span class="caret"></span></button>
                                                         <ul class="dropdown-menu">
+                                                            <li><a href="#">--</a></li>
                                                             <li><a href="#">X</a></li>
                                                             <li><a href="#">Y</a></li>
                                                         </ul>
@@ -133,26 +146,38 @@
                                                 </div>
                                                 </br>
                                                 <div class="input-group-addon">
-                                                    <label><input type="checkbox" class="var" value="temperature" aria-label="...">
+                                                    <label><input type="checkbox" class="var"
+                                                    value="temperature" aria-label="...">
                                                     temperature</label></br>
-                                                    <button type="button" class="btn btn-default jscolor {onFineChange:'update(this)'}" id="sct_lin_temperature_btn">Pick Color</button>
+                                                    <button type="button" class="btn btn-default
+                                                    jscolor"
+                                                    id="sct_lin_temperature_btn">Pick Color</button>
                                                     <div class="sct_lin_axis_dp dropdown">
-                                                        <button class="btn btn-primary dropdown-toggle" type="button" data-toggle="dropdown">Axis
+                                                        <button class="btn btn-primary
+                                                        dropdown-toggle" type="button"
+                                                        data-toggle="dropdown">Axis
                                                         <span class="caret"></span></button>
                                                         <ul class="dropdown-menu">
+                                                            <li><a href="#">--</a></li>
                                                             <li><a href="#">X</a></li>
                                                             <li><a href="#">Y</a></li>
                                                         </ul>
                                                     </div>
                                                 </div>
                                                 <div class="input-group-addon">
-                                                    <label><input type="checkbox" class="var" value="pressure" aria-label="...">
+                                                    <label><input type="checkbox" class="var"
+                                                    value="pressure" aria-label="...">
                                                     pressure</label></br>
-                                                    <button type="button" class="btn btn-default jscolor {onFineChange:'update(this)'}" id="sct_lin_pressure_btn">Pick Color</button>
+                                                    <button type="button" class="btn btn-default
+                                                    jscolor"
+                                                    id="sct_lin_pressure_btn">Pick Color</button>
                                                     <div class="sct_lin_axis_dp dropdown">
-                                                        <button class="btn btn-primary dropdown-toggle" type="button" data-toggle="dropdown">Axis
+                                                        <button class="btn btn-primary
+                                                        dropdown-toggle" type="button"
+                                                        data-toggle="dropdown">Axis
                                                         <span class="caret"></span></button>
                                                         <ul class="dropdown-menu">
+                                                            <li><a href="#">--</a></li>
                                                             <li><a href="#">X</a></li>
                                                             <li><a href="#">Y</a></li>
                                                         </ul>
@@ -162,8 +187,8 @@
                                         </div>
                                     </div>
                                     <div class="modal-footer">
-                                        <button type="button" class="btn btn-default modal_leave" id="modal_next_next" style="display: none">Create</button>
                                         <button type="button" class="btn btn-default" id="modal_next">Next</button>
+                                        <button type="button" class="btn btn-default modal_leave" id="modal_next_next">Create</button>
                                         <button type="button" class="btn btn-default modal_leave" data-dismiss="modal" id="modal_leave">Cancel</button>
                                     </div>
                                 </div> 

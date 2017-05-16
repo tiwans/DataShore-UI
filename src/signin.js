@@ -1,31 +1,123 @@
-"use strict";
+$('.form').find('input, textarea').on('keyup blur focus', function (e) {
+  
+  var $this = $(this),
+      label = $this.prev('label');
 
-var signUpForm = document.getElementById("signin-form");
+	  if (e.type === 'keyup') {
+			if ($this.val() === '') {
+          label.removeClass('active highlight');
+        } else {
+          label.addClass('active highlight');
+        }
+    } else if (e.type === 'blur') {
+    	if( $this.val() === '' ) {
+    		label.removeClass('active highlight'); 
+			} else {
+		    label.removeClass('highlight');   
+			}   
+    } else if (e.type === 'focus') {
+      
+      if( $this.val() === '' ) {
+    		label.removeClass('highlight'); 
+			} 
+      else if( $this.val() !== '' ) {
+		    label.addClass('highlight');
+			}
+    }
+
+});
+
+$('.tab a').on('click', function (e) {
+  
+  e.preventDefault();
+  
+  $(this).parent().addClass('active');
+  $(this).parent().siblings().removeClass('active');
+  
+  target = $(this).attr('href');
+
+  $('.tab-content > div').not(target).hide();
+  
+  $(target).fadeIn(600);
+  
+});
+
+
+var config = {
+    apiKey: "AIzaSyANfwhjv-oRcJhVp6sQfArTorgh4jsZFJw",
+    authDomain: "datashore-7057d.firebaseapp.com",
+    databaseURL: "https://datashore-7057d.firebaseio.com",
+    projectId: "datashore-7057d",
+    storageBucket: "datashore-7057d.appspot.com",
+    messagingSenderId: "352958906618"
+  };
+firebase.initializeApp(config);
+
+
+//* ############ SIGN UP FORM ############ *//
+var signUpForm = document.getElementById("signup-form");
 var emailInput = document.getElementById("email-input");
 var passwordInput = document.getElementById("password-input");
+var displayNameInput = document.getElementById("display-name-input");
 
 authenticateUser();
 
-signUpForm.addEventListener("submit", function(evt) {
-    evt.preventDefault();
+$("#signup_submit").on("click",function(){
+   signup();
+})
 
-  	if (passwordInput.value.length > 5) {
-	    firebase.auth().signInWithEmailAndPassword(emailInput.value, passwordInput.value)
-	        .then(function() {
-	            window.location = "index.html";
-	        })
-	        .catch(function(err) {
-	            alert(err.message);
-	        });
-	    return false;
-	}
-});
+// signUpForm.addEventListener("submit", function() {
+function signup(){
+    console.log("get started",emailInput.val);
+
+
+    firebase.auth().createUserWithEmailAndPassword(emailInput.value, passwordInput.value)
+        .then(function(user) {
+            return user.updateProfile({
+                displayName: displayNameInput.value,
+            });
+        })
+        .then(function() {
+            window.location.href = "/";
+        })
+        .catch(function(err) {
+            alert(err.message);
+        });
+}
+
 
 function authenticateUser(){
     firebase.auth().onAuthStateChanged(function(currUser) {
+        console.log("authentication called");
         if (currUser) {
             // User is signed in.
-            window.location.href = "index.html";
+            window.location.href = "/";
         }
     });
 }
+//* ############ END OF SIGN UP FORM ############ *//
+
+
+//* ############ SIGN IN FORM ############ *//
+var signInForm = document.getElementById("signin-form");
+var in_emailInput = document.getElementById("in_email-input");
+var in_passwordInput = document.getElementById("in_password-input");
+
+$("#signin_submit").on("click",function(){
+    console.log("get started",in_emailInput.val);
+    signin();
+})
+
+function signin(){
+    console.log("get started",in_emailInput.val);
+    firebase.auth().signInWithEmailAndPassword(in_emailInput.value, in_passwordInput.value)
+        .then(function() {
+            window.location = "/";
+        })
+        .catch(function(err) {
+            alert(err.message);
+        });
+}
+
+
+

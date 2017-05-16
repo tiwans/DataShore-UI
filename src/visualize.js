@@ -51,111 +51,9 @@ dataRef.on('value', function(snapshot) {
         //end of parsing//
 
 ////############## Start of  of Profolie ##############//
-//################                       ##############//
-//############## Start of  of Line Chart ##############//
-            var temp = {
-                y: myObject['pressure'],
-                x: myObject['temperature'],
-                mode: 'markers+lines',
-                type: 'scatter',
-                name: 'temperature',
-                line: {shape: 'spline'},
-                marker: { size: 5,
-                        color: 'rgb(93, 164, 214)'},
-            }
 
-            var density = {
-                y: myObject['pressure'],
-                x: myObject['density'],
-                mode: 'markers+lines',
-                type: 'scatter',
-                name: 'density',
-                line: {shape: 'spline'},
-                marker: { 
-                    size: 5,
-                    color: 'rgb(255, 65, 54)',
-                    sizeref: 2,
-                    symbol: 'square'},
-            };
+            creat_profolie(myObject,headers);
 
-            var salinity = {
-                y: myObject['pressure'],
-                x: myObject['salinity'],
-                mode: 'markers+lines',
-                type: 'scatter',
-                name: 'salinity',
-                line: {shape: 'spline'},
-                marker: { 
-                    size: 5,
-                    color: 'rgb(44, 160, 101)',
-                    sizeref: 2,
-                    symbol: 'diamond'},
-            };
-
-            //intergrated line chart--default//
-            var dataset1 =[temp,density,salinity];
-            var layout1 = {
-                title:'Basic Profile',
-                xaxis: {
-                    side: 'top',
-                    title: headers.toString()},
-                yaxis: {
-                    autorange: 'reversed',
-                    title: 'pressure'},
-                height: 700,
-                width:500
-            };
-             Plotly.newPlot('it_line_chart',dataset1,layout1);
-
-             //seperated line chart
-            var temp_layout = {
-                title:'Basic Profile',
-                xaxis: {
-                    side: 'top',
-                    title: "temperature"},
-                yaxis: {
-                    autorange: 'reversed',
-                    title: 'pressure'},
-                height: 500
-            };
-            var density_layout = {
-                title:'Basic Profile',
-                xaxis: {
-                    side: 'top',
-                    title: "density"},
-                yaxis: {
-                    autorange: 'reversed',
-                    title: 'pressure'},
-                height: 500
-            };
-            var salinity_layout = {
-                title:'Basic Profile',
-                xaxis: {
-                    side: 'top',
-                    title: "salinity"},
-                yaxis: {
-                    autorange: 'reversed',
-                    title: 'pressure'},
-                height: 500
-            };
-            Plotly.newPlot('temp',[temp],temp_layout);
-            Plotly.newPlot('density',[density],density_layout);
-            Plotly.newPlot('salinity',[salinity],salinity_layout);
-            var it_line_chart = document.getElementById("it_line_chart");
-            var sp_line_chart = document.getElementById("sp_line_chart");
-            sp_line_chart.setAttribute("style","display:none");
-            //switch between intergrated and seperated chart
-            $(".mdl-switch__input").click(function(){
-                var checked=$(this).prop('checked');
-                if (checked){
-                    it_line_chart.setAttribute("style","display:block");
-                    sp_line_chart.setAttribute("style","display:none");
-                }else{
-                    it_line_chart.setAttribute("style","display:none");
-                    sp_line_chart.setAttribute("style","display:block");
-                }
-            })
-////############## End of  of Line Chart ##############//
 //################+++++++++++++++++++++################//
 //############## End of the Porfolie ##############//
 
@@ -191,41 +89,61 @@ dataRef.on('value', function(snapshot) {
                 // chart_content.innerHTML="<p>hello</p>";
                 var chart_type;
                 $('#add_chart_btn').on('click',function(){
-                    $('#chart_sel_modal').prop("style","display:block");
-                    $("#modal_next_next").prop("style","dispaly:none");
+                    $('#chart_sel_modal').css("display","block");
+                    $("#modal_next_next").css("display","none");
                 });
                 $('.list-group-item').click(function() {
-                    $("#modal_next_next").prop("style","dispaly:none");
-                    $("#modal_next").prop("style","display:block");
-                    $('#chart_input').prop("style","display:none");
-                    $('#chart_type_preview').prop("style","display:block");
+                    $("#modal_next_next").css("display","none");
+                    $("#modal_next").css("display","inline-block");
+                    $('#chart_input').css("display","none");
+                    $('#chart_type_preview').css("display","inline-block");
                     $("#chart_img_src").prop("src","./img/" +$(this).prop("id")+".png");
+                    $('#scatter_line').css("display","none");
                     chart_type = $(this).prop("id");
                 });
                 $("#modal_next").click(function(){
-                    $("#modal_next").prop("style","display:none");
+                    $("#modal_next").css("display","none");
                     console.log("chart_type",chart_type);
-                    $("#modal_next_next").prop("style","dispaly:block");
-                    $('#chart_type_preview').prop("style","display:none");
+                    $("#modal_next_next").css("display","inline-block");
+                    $('#chart_type_preview').css("display","none");
+                    $('#scatter_line').css("display","block");
                     if(chart_type=="scatter_plot"||chart_type=="line_chart"){
-                        $('#scatter_line').prop("style","display:block");
                         $("#modal_next_next").click(function(){
-                            var x = [];
-                            var y =[];
+                            var x = {};
+                            var y ={};
                             $.each($(".var:checkbox:checked"), function(){   
                                 console.log("clicked_create", $(this).val());     
-                                // x_y["x"].push($(this).val());
                                 var $div = $(this).parent().parent();
                                 var $btn = $div.find(".jscolor");
                                 console.log($div.prop("class"));
                                 if($btn.css("visibility")=="hidden"){
-                                    x=myObject[""+$(this).val()];
+                                    x[""+$(this).val()]=myObject[""+$(this).val()]
                                 }
                                 if($btn.css("visibility")!="hidden"){
-                                    y=myObject[""+$(this).val()]
+                                    y[""+$(this).val()]=myObject[""+$(this).val()]
+                                    y["color"]=$btn.css("background-color");
                                 }
                             });
                             create_scatter_line(x,y,chart_type);
+                        });
+                    }else if(chart_type=="box plot" || chart_type=="histogram"){
+                        $("#modal_next_next").click(function(){
+                            var y ={};
+                            $.each($(".var:checkbox:checked"), function(){   
+                                console.log("clicked_create", $(this).val());     
+                                var $div = $(this).parent().parent();
+                                var $btn = $div.find(".jscolor");
+                                console.log($btn.prop("class"));
+                                // if($btn.css("visibility")=="hidden"){
+                                //     x[""+$(this).val()]=myObject[""+$(this).val()]
+                                // }
+                                if($btn.css("visibility")!="hidden"){
+                                    console.log("btn finded");
+                                    y[""+$(this).val()]=myObject[""+$(this).val()]
+                                    y["color"]=$btn.css("background-color");
+                                }
+                            });
+                            create_box_hist(y,chart_type);
                         });
                     }
                 });
@@ -237,6 +155,111 @@ dataRef.on('value', function(snapshot) {
     });
 });
 
+
+
+function creat_profolie(myObject,headers){
+    var temp = {
+                y: myObject['pressure'],
+                x: myObject['temperature'],
+                mode: 'markers+lines',
+                type: 'scatter',
+                name: 'temperature',
+                line: {shape: 'spline'},
+                marker: { size: 5,
+                        color: 'rgb(93, 164, 214)'},
+            }
+    var density = {
+        y: myObject['pressure'],
+        x: myObject['density'],
+        mode: 'markers+lines',
+        type: 'scatter',
+        name: 'density',
+        line: {shape: 'spline'},
+        marker: { 
+            size: 5,
+            color: 'rgb(255, 65, 54)',
+            sizeref: 2,
+            symbol: 'square'},
+    };
+
+    var salinity = {
+        y: myObject['pressure'],
+        x: myObject['salinity'],
+        mode: 'markers+lines',
+        type: 'scatter',
+        name: 'salinity',
+        line: {shape: 'spline'},
+        marker: { 
+            size: 5,
+            color: 'rgb(44, 160, 101)',
+            sizeref: 2,
+            symbol: 'diamond'},
+    };
+
+    //intergrated line chart--default//
+    var dataset1 =[temp,density,salinity];
+    var layout1 = {
+        title:'Basic Profile',
+        xaxis: {
+            side: 'top',
+            title: headers.toString()},
+        yaxis: {
+            autorange: 'reversed',
+            title: 'pressure'},
+        height: 700,
+        width:500
+    };
+    Plotly.newPlot('it_line_chart',dataset1,layout1);
+
+    //seperated line chart
+    var temp_layout = {
+        title:'Basic Profile',
+        xaxis: {
+            side: 'top',
+            title: "temperature"},
+        yaxis: {
+            autorange: 'reversed',
+            title: 'pressure'},
+        height: 500
+    };
+    var density_layout = {
+        title:'Basic Profile',
+        xaxis: {
+            side: 'top',
+            title: "density"},
+        yaxis: {
+            autorange: 'reversed',
+            title: 'pressure'},
+        height: 500
+    };
+    var salinity_layout = {
+        title:'Basic Profile',
+        xaxis: {
+            side: 'top',
+            title: "salinity"},
+        yaxis: {
+            autorange: 'reversed',
+            title: 'pressure'},
+        height: 500
+    };
+    Plotly.newPlot('temp',[temp],temp_layout);
+    Plotly.newPlot('density',[density],density_layout);
+    Plotly.newPlot('salinity',[salinity],salinity_layout);
+    var it_line_chart = document.getElementById("it_line_chart");
+    var sp_line_chart = document.getElementById("sp_line_chart");
+    sp_line_chart.setAttribute("style","display:none");
+    //switch between intergrated and seperated chart
+    $(".mdl-switch__input").click(function(){
+        var checked=$(this).prop('checked');
+        if (checked){
+            it_line_chart.setAttribute("style","display:block");
+            sp_line_chart.setAttribute("style","display:none");
+        }else{
+            it_line_chart.setAttribute("style","display:none");
+            sp_line_chart.setAttribute("style","display:block");
+        }
+    })
+}
 //take in para: 
 //@x:array || @y:array ||@z_ary: dict,object ||@color_ary: dict,object
 function create_heatmap(x,y,z_ary,color_ary){
@@ -294,37 +317,108 @@ function reorgZ_ary(array,column_length,row_length){
 function create_scatter_line(x,y,chart_type){
     var parent_div=document.getElementById("page_content_chart");
     var child_div = document.createElement("div");
-    console.log(x);
-    console.log(y);
+    var y_keys = Object.keys(y);
+    var x_keys=Object.keys(x);
+    var id=chart_type+"_"+x_keys[0]+"_"+y_keys[0];
     if(chart_type=="scatter_plot"){
+        var hexColor = rgb2hex(y[y_keys[1]]);
         var trace1 = {
-            x: x,
-            y: y,
-            mode: 'markers'
+            x: x[x_keys[0]],
+            y: y[y_keys[0]],
+            mode: 'markers',
+            marker: {
+                size: 10,
+                color:hexColor,
+            }
         };
+        var data = [trace1];
         var layout = {
-            title: ""+chart_type,
-            height: 400,
-            width: 400
-        }
-        Plotly.newPlot(child_div,[trace1]);
+            title:""+chart_type,
+            xaxis: {
+                title: Object.keys(x)[0]},
+            yaxis: {
+                title: Object.keys(y)[0]},
+        };
         child_div.setAttribute("class","scatter");
+        child_div.setAttribute("id",id);
     }else{
+        var hexColor = rgb2hex(y[y_keys[1]]);
         var trace1 = {
-            x: x,
-            y: y,
-            type: 'markers+lines'
+            x: x[x_keys[0]],
+            y: y[y_keys[0]],
+            mode: 'lines',
+            line: {
+                color:hexColor,
+                width: 3
+                }
         };
+        var data = [trace1];
         var layout = {
-            title: ""+chart_type,
-            height: 400,
-            width: 400
-        }
-        Plotly.newPlot(child_div,[trace1]);
+            title:""+chart_type,
+            xaxis: {
+                title: Object.keys(x)[0]},
+            yaxis: {
+                title: Object.keys(y)[0]},
+        };
         child_div.setAttribute("class","line");
+        child_div.setAttribute("id",id);
     }
     parent_div.appendChild(child_div);
+    Plotly.newPlot(id,data,layout);
 }
+
+function create_box_hist(y,chart_type){
+    console.log(y,chart_type);
+    var parent_div=document.getElementById("page_content_chart");
+    var child_div = document.createElement("div");
+    var y_keys = Object.keys(y);
+    // var x_keys=Object.keys(x);
+    var id=chart_type+"_"+y_keys[0];
+    if(chart_type=="box plot"){
+        var hexColor = rgb2hex(y[y_keys[1]]);
+        var data = [
+                    {
+                        y: y[y_keys[0]],
+                        boxpoints: 'all',
+                        jitter: 0.3,
+                        pointpos: -1.8,
+                        marker: {color: hexColor},
+                        type: 'box'
+                        
+                    }
+                    ];
+        var layout = {
+            title:""+chart_type,
+            yaxis: {
+                title: Object.keys(y)[0]},
+        };
+        child_div.setAttribute("class","box");
+        child_div.setAttribute("id",id);
+    }else{
+        var hexColor = rgb2hex(y[y_keys[1]]);
+        var data = [
+                    {
+                        x: y[y_keys[0]],
+                        type:"histogram",
+                        opacity: 0.5,
+                        marker: {
+                            color: hexColor,
+                        },
+                    }
+                    ];
+        var layout = {
+            title:""+chart_type,
+            xaxis: {title: Object.keys(y)[0]},
+            yaxis: {title: "count"}
+        };
+        child_div.setAttribute("class","box");
+        child_div.setAttribute("id",id);
+    }
+    parent_div.appendChild(child_div);
+    Plotly.newPlot(id,data,layout);
+}
+
+
 
 //* other code *//
 //sct_lin_varSel
@@ -345,3 +439,12 @@ $('.sct_lin_axis_dp ul.dropdown-menu li a').click(function (e) {
     e.preventDefault();
     return false;
 });
+
+
+function rgb2hex(rgb){
+    rgb = rgb.match(/^rgb?[\s+]?\([\s+]?(\d+)[\s+]?,[\s+]?(\d+)[\s+]?,[\s+]?(\d+)[\s+]?/i);
+    return (rgb && rgb.length === 4) ? "#" +
+    ("0" + parseInt(rgb[1],10).toString(16)).slice(-2) +
+    ("0" + parseInt(rgb[2],10).toString(16)).slice(-2) +
+    ("0" + parseInt(rgb[3],10).toString(16)).slice(-2) : '';
+}
