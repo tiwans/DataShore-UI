@@ -78,7 +78,7 @@ function signup(){
             });
         })
         .then(function() {
-            window.location.href = "/";
+            window.location.href = "index.html";
         })
         .catch(function(err) {
             alert(err.message);
@@ -91,7 +91,7 @@ function authenticateUser(){
         console.log("authentication called");
         if (currUser) {
             // User is signed in.
-            window.location.href = "/";
+            window.location.href = "index.html";
         }
     });
 }
@@ -112,7 +112,7 @@ function signin(){
     console.log("get started",in_emailInput.val);
     firebase.auth().signInWithEmailAndPassword(in_emailInput.value, in_passwordInput.value)
         .then(function() {
-            window.location = "/";
+            window.location = "index.html";
         })
         .catch(function(err) {
             alert(err.message);
