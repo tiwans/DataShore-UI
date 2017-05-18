@@ -36,7 +36,7 @@ function authenticateUser(){
             sessionStorage.USER = USER.displayName;
         } else {
             // No user is signed in.
-            window.location.href = "/html/signin.html";
+            window.location.href = "./html/signin.html";
         }
     });
 }
