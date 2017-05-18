@@ -22,6 +22,14 @@ var static_content = document.getElementById("page_content_static");
 chart_content.setAttribute("style","display:none");
 static_content.setAttribute("style","display:none");
 $("#nav_bead_pn").html(project_name);
+$("#signout").click(function(){
+    console.log("click");
+    firebase.auth().signOut().then(function() {
+        window.location.href = "/src/html/signin.html";
+    }, function(error) {
+        console.error('Sign Out Error', error);
+    });
+});
 //############## End of Initialize ##############//
 
 dataRef.on('value', function(snapshot) {
