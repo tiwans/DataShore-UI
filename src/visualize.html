@@ -45,9 +45,9 @@
             <main class="mdl-layout__content">
                 <div id="nav_breadcrumbs">
                     <ol class="breadcrumb">
-                        <li><a href="#">Home</a></li>
-                        <li><a href="#">Project_1</a></li>
-                        <li class="active">Profile</li>
+                        <li><a href="/">Home</a></li>
+                        <li><a href="#" id="nav_bead_pn">Project_1</a></li>
+                        <li class="active" id="nav_bead_li">Profile</li>
                     </ol>
                 </div>
                 <div id="page-content" class="row"><!-- Your content goes here -->
@@ -66,20 +66,19 @@
                             </label>
                         </div>
                         <div id="it_line_chart">
-
                         </div>
                         <div id="sp_line_chart" class="row">
                             <div id="temp" class="col-md-4"></div>
                             <div id="density" class="col-md-4"></div>
                             <div id="salinity" class="col-md-4"></div>
                         </div>
+                        <div id="pined_chart">
+                        </div>
                     </div>
-                    <div id="page_content_chart" class="col-md-10 row" style="display: none">
-                         <button type="button" class="btn" id="add_chart_btn">Add New Chart</button>
-                         <!-- Modal for chart part -->
-                        <div style="display: none" id="chart_sel_modal" role="dialog">
+                    <!-- Modal for chart part -->
+                    <div style="display: none" id="chart_sel_modal" role="dialog">
                             <div class="modal-dialog">
-                                <!-- Modal content-->
+                            <!-- Modal content-->
                                 <div class="modal-content">
                                     <div class="modal-header">
                                         <button type="button" class="close modal_leave" data-dismiss="modal">&times;</button>
@@ -193,7 +192,11 @@
                                     </div>
                                 </div> 
                             </div>
-                        </div> 
+                         </div> 
+                    <div id="page_content_chart" class="col-md-10" style="display: none">
+                         <button type="button" class="btn" id="add_chart_btn">Add New Chart</button>
+                         </br>
+                         <div id="chart_list" class="container"></div>
                     </div>
                     <div id="page_content_static" class="col-md-10" style="display: none">
                     </div>

@@ -6,6 +6,31 @@ h1 {
     color: blue;
 
 }
+/* project list */
+
+/*project card */
+#project_list, #add_project_btn{
+    width: 80%;
+    margin: auto;
+    display: flex;
+    justify-content: space-around;
+}
+
+#add_project_btn{
+    background-color:lightblue;
+}
+
+
+.demo-card-square.mdl-card {
+  width: 320px;
+  height: 320px;
+}
+.demo-card-square > .mdl-card__title {
+  color: #fff;
+  background-color:  #46B6AC;
+}
+/* end of project card */
+
 
 .home{
     margin: auto;

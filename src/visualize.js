@@ -2,6 +2,7 @@
 
 //############## Initialize ##############//
 var project_name=sessionStorage.getItem("project_name")
+var USER=sessionStorage.getItem("USER");
 var config = {
     apiKey: "AIzaSyANfwhjv-oRcJhVp6sQfArTorgh4jsZFJw",
     authDomain: "datashore-7057d.firebaseapp.com",
@@ -14,12 +15,13 @@ firebase.initializeApp(config);
 var database = firebase.database();
 console.log(project_name);
 var output_res=[];
-var dataRef = database.ref('project/' + project_name);
+var dataRef = database.ref('project/' + USER + "/" + project_name);
 var pro_content = document.getElementById("page_content_profile");
 var chart_content = document.getElementById("page_content_chart");
 var static_content = document.getElementById("page_content_static");
 chart_content.setAttribute("style","display:none");
 static_content.setAttribute("style","display:none");
+$("#nav_bead_pn").html(project_name);
 //############## End of Initialize ##############//
 
 dataRef.on('value', function(snapshot) {
@@ -50,9 +52,10 @@ dataRef.on('value', function(snapshot) {
             console.log(window.data);
         //end of parsing//
 
-////############## Start of  of Profolie ##############//
+////############## Start of  of Profolie  and Chart from firebase##############//
 
             creat_profolie(myObject,headers);
+            
 
 //################+++++++++++++++++++++################//
 //############## End of the Porfolie ##############//
@@ -64,6 +67,7 @@ dataRef.on('value', function(snapshot) {
                 pro_content.setAttribute("style","display:block");
                 static_content.setAttribute("style","display:none");
                 chart_content.setAttribute("style","display:none");
+                $("#nav_bead_li").html("Profile");
                 $("#nav_pro").prop("class","active");
                 $("#nav_chart").prop("class","abled");
                 $("#nav_static").prop("class","abled");
@@ -72,6 +76,7 @@ dataRef.on('value', function(snapshot) {
                 chart_content.setAttribute("style","display:block");
                 pro_content.setAttribute("style","display:none");
                 static_content.setAttribute("style","display:none");
+                 $("#nav_bead_li").html("Chart");
                 $("#nav_chart").prop("class","active");
                 $("#nav_pro").prop("class","abled");
                  $("#nav_static").prop("class","abled");
@@ -81,6 +86,7 @@ dataRef.on('value', function(snapshot) {
                 static_content.setAttribute("style","display:block");
                 chart_content.setAttribute("style","display:none");
                 pro_content.setAttribute("style","display:none");
+                 $("#nav_bead_li").html("Static");
                 $("#nav_static").prop("class","active");
                 $("#nav_pro").prop("class","abled");
                 $("#nav_chart").prop("class","abled");
@@ -88,7 +94,21 @@ dataRef.on('value', function(snapshot) {
             function display_chart(){
                 // chart_content.innerHTML="<p>hello</p>";
                 var chart_type;
+                var dataRef = database.ref('project/' + sessionStorage.USER +  "/" + project_name +"/chart/");
+                var pined_chart =document.getElementById("pined_chart");
+                dataRef.once('value', function(snapshot) {
+                    snapshot.forEach(function(chart) {
+                        var chart = chart.toJSON();
+                        console.log(chart.var[0],chart.var[1]);
+                        if(chart.chart_type =="line_chart" || chart.chart_type=="scatter_plot"){
+                            create_scatter_line(chart.var[0],chart.var[1],chart.chart_type);
+                        }else if(chart.chart_type=="box plot" || chart.chart_type=="histogram"){
+                            create_box_hist(chart.var[0],chart.chart_type);
+                        }
+                    });
+                });
                 $('#add_chart_btn').on('click',function(){
+                    $('#chart_list').css("display","none");
                     $('#chart_sel_modal').css("display","block");
                     $("#modal_next_next").css("display","none");
                 });
@@ -102,6 +122,8 @@ dataRef.on('value', function(snapshot) {
                     chart_type = $(this).prop("id");
                 });
                 $("#modal_next").click(function(){
+                    var chart_id;
+                    var variable=[];
                     $("#modal_next").css("display","none");
                     console.log("chart_type",chart_type);
                     $("#modal_next_next").css("display","inline-block");
@@ -124,6 +146,16 @@ dataRef.on('value', function(snapshot) {
                                     y["color"]=$btn.css("background-color");
                                 }
                             });
+                            chart_id=Object.keys(x)[0]+"_"+Object.keys(y)[0]+"_"+chart_type;
+                            variable.push(x);
+                            variable.push(y);
+                            // console.log(sessionStorage.variable,sessionStorage.chart_id);
+                            database.ref('project/' + sessionStorage.USER + "/" + sessionStorage.project_name +"/chart/"+chart_id).set({
+                                chart_type:chart_type,
+                                var:variable,
+                                pin:false,
+                            });
+                             $('#chart_list').css("display","block");
                             create_scatter_line(x,y,chart_type);
                         });
                     }else if(chart_type=="box plot" || chart_type=="histogram"){
@@ -143,16 +175,43 @@ dataRef.on('value', function(snapshot) {
                                     y["color"]=$btn.css("background-color");
                                 }
                             });
+                            variable.push(y);
+                            chart_id=Object.keys(y)[0]+"_"+chart_type;
+                            // console.log(sessionStorage.variable,sessionStorage.chart_id);
+                            database.ref('project/' + sessionStorage.USER + "/" + sessionStorage.project_name +"/chart/"+chart_id).set({
+                                chart_type:chart_type,
+                                var:variable,
+                                pin:false,
+                            });
+                             $('#chart_list').css("display","block");
                             create_box_hist(y,chart_type);
                         });
                     }
                 });
                 $(".modal_leave").click(function(){
+                     $('#chart_list').css("display","block");
                     $('#chart_sel_modal').prop("style","display:none");
                 })
             }
         }
     });
+});
+
+// $.each($(".pin:checkbox:checked"), function(){ 
+//         var $div = $(this).parent().parent();
+//         var $sub_div = $div.find(".js-plotly-plot");  
+//         $("#pined_chart").html($sub_div);
+//         console.log("content",$sub_div);
+// });
+
+$(".pin").change(function() {
+    console.log("click");
+    // if(this.checked) {
+    //     var $div = $(this).parent().parent();
+    //     var $sub_div = $div.find(".js-plotly-plot");  
+    //     $("#pined_chart").html($sub_div);
+    //     console.log("content",$sub_div);
+    // }
 });
 
 
@@ -264,7 +323,7 @@ function creat_profolie(myObject,headers){
 //@x:array || @y:array ||@z_ary: dict,object ||@color_ary: dict,object
 function create_heatmap(x,y,z_ary,color_ary){
     console.log(x,y,z_ary,color_ary);
-    var parent_div=document.getElementById("page_content_chart");
+    var parent_div=document.getElementById("chart_list");
     var map_var_count=Object.keys(z_ary).length;
     var column_length=4; //x.length;
     var row_length=9; //y.length;
@@ -315,16 +374,29 @@ function reorgZ_ary(array,column_length,row_length){
 }
 
 function create_scatter_line(x,y,chart_type){
-    var parent_div=document.getElementById("page_content_chart");
+    var parent_div=document.getElementById("chart_list");
     var child_div = document.createElement("div");
     var y_keys = Object.keys(y);
     var x_keys=Object.keys(x);
     var id=chart_type+"_"+x_keys[0]+"_"+y_keys[0];
+    var y_list = y[y_keys[0]];
+    var x_list = x[x_keys[0]];
+    var y_tit = Object.keys(y)[0];
+    var x_tit = Object.keys(x)[0];
+    var hexColor;
+    if(y_keys[0]=="color"){
+        y_list = Object.values(y[y_keys[1]]);
+        x_list = Object.values(x_list);
+        y_tit = Object.keys(y)[1];
+        hexColor = y.color;
+    }else{
+       hexColor = rgb2hex(y[y_keys[1]])
+    }
+    console.log(x_list,y_list);
     if(chart_type=="scatter_plot"){
-        var hexColor = rgb2hex(y[y_keys[1]]);
         var trace1 = {
-            x: x[x_keys[0]],
-            y: y[y_keys[0]],
+            x: x_list,
+            y: y_list,
             mode: 'markers',
             marker: {
                 size: 10,
@@ -333,19 +405,20 @@ function create_scatter_line(x,y,chart_type){
         };
         var data = [trace1];
         var layout = {
-            title:""+chart_type,
+            title:""+x_tit + " " +y_tit + " " + chart_type,
             xaxis: {
-                title: Object.keys(x)[0]},
+                title: x_tit},
             yaxis: {
-                title: Object.keys(y)[0]},
+                title: y_tit},
+            height: 500,
+            width:500
         };
         child_div.setAttribute("class","scatter");
         child_div.setAttribute("id",id);
     }else{
-        var hexColor = rgb2hex(y[y_keys[1]]);
         var trace1 = {
-            x: x[x_keys[0]],
-            y: y[y_keys[0]],
+            x: x_list,
+            y: y_list,
             mode: 'lines',
             line: {
                 color:hexColor,
@@ -354,22 +427,28 @@ function create_scatter_line(x,y,chart_type){
         };
         var data = [trace1];
         var layout = {
-            title:""+chart_type,
+            title:""+x_tit + " " +y_tit + " " + chart_type,
             xaxis: {
-                title: Object.keys(x)[0]},
+                title: x_tit},
             yaxis: {
-                title: Object.keys(y)[0]},
+                title: y_tit},
+            height: 500,
+            width:500
         };
         child_div.setAttribute("class","line");
         child_div.setAttribute("id",id);
     }
+    var checkbox =document.createElement("div");
+    checkbox.innerHTML = "<input type='checkbox' class='pin'>Pined to Profoile";
+    child_div.appendChild(checkbox);
     parent_div.appendChild(child_div);
     Plotly.newPlot(id,data,layout);
+    child_div.style.border = "2px solid black";
 }
 
 function create_box_hist(y,chart_type){
     console.log(y,chart_type);
-    var parent_div=document.getElementById("page_content_chart");
+    var parent_div=document.getElementById("chart_list");
     var child_div = document.createElement("div");
     var y_keys = Object.keys(y);
     // var x_keys=Object.keys(x);
@@ -391,6 +470,8 @@ function create_box_hist(y,chart_type){
             title:""+chart_type,
             yaxis: {
                 title: Object.keys(y)[0]},
+            height: 500,
+            width:500
         };
         child_div.setAttribute("class","box");
         child_div.setAttribute("id",id);
@@ -409,13 +490,19 @@ function create_box_hist(y,chart_type){
         var layout = {
             title:""+chart_type,
             xaxis: {title: Object.keys(y)[0]},
-            yaxis: {title: "count"}
+            yaxis: {title: "count"},
+            height: 500,
+            width:500
         };
         child_div.setAttribute("class","box");
         child_div.setAttribute("id",id);
     }
+    var checkbox =document.createElement("div");
+    checkbox.innerHTML = "<input type='checkbox' class='pin'>Pined to Profoile";
+    child_div.appendChild(checkbox);
     parent_div.appendChild(child_div);
     Plotly.newPlot(id,data,layout);
+    $(".js-plotly-plot").style.border = "2px solid black";
 }
 
 

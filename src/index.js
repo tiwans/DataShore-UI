@@ -26,13 +26,14 @@ var config = {
 firebase.initializeApp(config);
 var database = firebase.database();
 //############## Authentication User ##############//
-authenticateUser();
+init();
 function authenticateUser(){
     firebase.auth().onAuthStateChanged(function(currUser) {
         if (currUser) {
             // User is signed in.
             USER = currUser;
             console.log(USER.displayName);
+            sessionStorage.USER = USER.displayName;
         } else {
             // No user is signed in.
             window.location.href = "src/signin.html";
@@ -47,12 +48,20 @@ var upload_data = "<div class='home panel' id='upload_data'><div class='panel-he
 var output_dt="<div class='home panel' id='output_dt'><div class='panel-heading'><h2 class='panel-title'>View Output</h2></div><div class='panel-body'><div id=table_div'><table class='table table-striped' id='output_table'></table></div><button type='button' class='btn btn-default stg_btn' onClick=download()>Download Output and Exit</button><a href='/src/visualize.html' type='button' class='btn btn-default'>Continue to Dashboard</a></div></div>"
 
 //##############End of Different Process Stage###########//
-init();
-
-   
 //#### init ####//
 function init(){
-    stage_content.innerHTML = create_project;
+    authenticateUser();
+    console.log(sessionStorage.USER);
+    var dataRef = database.ref('project/').child(sessionStorage.USER);
+    dataRef.once("value",function(snapshot){
+        if(snapshot.toJSON() != null){
+            console.log("get_list");
+            get_list();
+        }else{
+            console.log("create_project");
+            creat_project();
+        }
+    })
     $("#signout").click(function(){
             firebase.auth().signOut().then(function() {
                 window.location.href = "signin.html";
@@ -62,8 +71,47 @@ function init(){
         });
 }
 
+///#####++++++++++++++++#####//
+///###  GET PROJECT LIST  ###//
+///#####               #####//
+function get_list(){
+    $("#creat_new_project").css("display","none");
+    $("#view_project_list").css("display","block");
+    var dataRef = database.ref('project/' + sessionStorage.USER);
+    var project_list_div =document.getElementById("project_list");
+    dataRef.once('value', function(snapshot) {
+        snapshot.forEach(function(child) {
+                var project = child.toJSON();
+                console.log(project);
+                var projectName = project.Project_Tittle;
+                var creatDate = project.CreateDate;
+                var project_div = document.createElement("div");
+                project_div.setAttribute("class","project_card demo-card-square mdl-card mdl-shadow--2dp");
+                project_div.innerHTML="<div class='mdl-card__title mdl-card--expand'><h2 class='project_tit_text mdl-card__title-text'>"+projectName+"</h2></div><div class='project_card_content mdl-card__supporting-text'>"+creatDate+"</div><div class='mdl-card__actions mdl-card--border'><a class='project_link mdl-button mdl-button--colored mdl-js-button mdl-js-ripple-effect' href='/src/visualize.html'>View Updates</a></div>"
+                project_list_div.appendChild(project_div);
+                $('.project_link').click(function(){
+                    sessionStorage.project_name = projectName;
+                });
+        });
+    });
+    $("#add_project_btn").click(function(){
+        creat_project();
+    })
+}
 
+
+
+
+///#####++++++++++++++++#####//
+///###CREATE NEW PROJECT###//
+///#####              #####//
 //#### tutorial ####//
+function creat_project(){
+    $("#creat_new_project").css("display","block");
+    $("#view_project_list").css("display","none");
+    stage_content.innerHTML = create_project;
+}
+
 function showTut(){
     var tut_innerHTML='<div><img src="src/tut_1.1.png" alt="tutorial_1" id="tut_img_1"><img src="src/tut_2.png" alt="tutorial_2" id="tut_img_2"></div>';
     var tut_btn = '<button type="button" class="mdl-button mdl-button--fab" id="tut_btn_done" onClick="removeTut()"><i class="material-icons" id="tut_icon">clear</i></button>'
@@ -244,7 +292,7 @@ function upload(){
 
 
 function writeData(project_name){
-    database.ref('project/' + project_name).set({
+    database.ref('project/' + USER.displayName + "/" + project_name).set({
         Project_Tittle: project_name,
         CreateDate: Date(),
         Uploaded_File: csvData,
@@ -286,6 +334,7 @@ function download(){
     document.body.appendChild(link); // Required for FF
 
     link.click();
+    get_list();
 }
 
 function downloadTemplate(template_var){
@@ -307,7 +356,7 @@ function downloadTemplate(template_var){
 }
 
 function retrive_output(project_name){
-    var dataRef = database.ref('project/' + project_name);
+    var dataRef = database.ref('project/' + USER.displayName +"/" + project_name);
     dataRef.once('value', function(snapshot) {
         snapshot.forEach(function(child) {
             if(child.key == 'Uploaded_File'){
@@ -372,4 +421,3 @@ function creatTB(res_len){
     }
     table.appendChild(tbody);
 }
-
