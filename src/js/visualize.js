@@ -25,7 +25,7 @@ $("#nav_bead_pn").html(project_name);
 $("#signout").click(function(){
     console.log("click");
     firebase.auth().signOut().then(function() {
-        window.location.href = "src/html/signin.html";
+        window.location.href = "../html/signin.html";
     }, function(error) {
         console.error('Sign Out Error', error);
     });
