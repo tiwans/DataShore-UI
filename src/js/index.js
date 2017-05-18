@@ -36,7 +36,7 @@ function authenticateUser(){
             sessionStorage.USER = USER.displayName;
         } else {
             // No user is signed in.
-            window.location.href = "src/signin.html";
+            window.location.href = "src/html/signin.html";
         }
     });
 }
@@ -45,7 +45,7 @@ function authenticateUser(){
 var create_project = "<div class='home panel' id='create_project'><div class='panel-heading'><h2 class='panel-title'>Create Project</h2></div><div class='panel-body'>Name your project<div class='input-group project_name'><span class='input-group-addon' id='sizing-addon2'>Name</span><input type='text' class='form-control' placeholder='Project Name' aria-describedby='sizing-addon2' id='project_name'></div><button type='button' class='btn btn-default stg_btn' onClick=creatPro()>Create</button></div></div>";
 var select_var = '<div class="home panel" id="variable-select"><div class="panel-heading"><h2 class="panel-title">Select Variable</h2></div><div class="panel-body">Choose a varibale to predict!</div><div><select id="varSelect" class="dropdown" onchange="selectVar(event)"><option value="">---</option><option value="salinity">Salinity</option><option value="temperature">Temperature</option><option value="density">Density</option><option value="other">Other</option></select></div></div> <div class="home panel" id="variable-require"><div class="panel-heading"><h2 class="panel-title">Prepare to Upload your Data</h2></div><div class="panel-body">The required varables needed to predict</div><div><p id="variable-require-result"></p></div></div>';
 var upload_data = "<div class='home panel' id='upload_data'><div class='panel-heading'><h2 class='panel-title'>Upload Data</h2></div><div class='panel-body'>Choose the file to uploadupload_data<input type='file' name='File Upload' id='txtFileUpload' onChange='browse(event)' accept='.csv'/><button type='button' class='btn btn-default stg_btn' onClick='upload()'>Upload</button></div></div>";
-var output_dt="<div class='home panel' id='output_dt'><div class='panel-heading'><h2 class='panel-title'>View Output</h2></div><div class='panel-body'><div id=table_div'><table class='table table-striped' id='output_table'></table></div><button type='button' class='btn btn-default stg_btn' onClick=download()>Download Output and Exit</button><a href='/src/visualize.html' type='button' class='btn btn-default'>Continue to Dashboard</a></div></div>"
+var output_dt="<div class='home panel' id='output_dt'><div class='panel-heading'><h2 class='panel-title'>View Output</h2></div><div class='panel-body'><div id=table_div'><table class='table table-striped' id='output_table'></table></div><button type='button' class='btn btn-default stg_btn' onClick=download()>Download Output and Exit</button><a href='../html/visualize.html' type='button' class='btn btn-default'>Continue to Dashboard</a></div></div>"
 
 //##############End of Different Process Stage###########//
 //#### init ####//
@@ -87,7 +87,7 @@ function get_list(){
                 var creatDate = project.CreateDate;
                 var project_div = document.createElement("div");
                 project_div.setAttribute("class","project_card demo-card-square mdl-card mdl-shadow--2dp");
-                project_div.innerHTML="<div class='mdl-card__title mdl-card--expand'><h2 class='project_tit_text mdl-card__title-text'>"+projectName+"</h2></div><div class='project_card_content mdl-card__supporting-text'>"+creatDate+"</div><div class='mdl-card__actions mdl-card--border'><a class='project_link mdl-button mdl-button--colored mdl-js-button mdl-js-ripple-effect' href='/src/visualize.html'>View Updates</a></div>"
+                project_div.innerHTML="<div class='mdl-card__title mdl-card--expand'><h2 class='project_tit_text mdl-card__title-text'>"+projectName+"</h2></div><div class='project_card_content mdl-card__supporting-text'>"+creatDate+"</div><div class='mdl-card__actions mdl-card--border'><a class='project_link mdl-button mdl-button--colored mdl-js-button mdl-js-ripple-effect' href='../html/visualize.html'>View Updates</a></div>"
                 project_list_div.appendChild(project_div);
                 $('.project_link').click(function(){
                     sessionStorage.project_name = projectName;
