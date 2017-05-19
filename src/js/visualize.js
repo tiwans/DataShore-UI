@@ -25,7 +25,7 @@ $("#nav_bead_pn").html(project_name);
 $("#signout").click(function(){
     console.log("click");
     firebase.auth().signOut().then(function() {
-        window.location.href = "../html/signin.html";
+        window.location.href = "signin.html";
     }, function(error) {
         console.error('Sign Out Error', error);
     });
@@ -125,7 +125,7 @@ dataRef.on('value', function(snapshot) {
                     $("#modal_next").css("display","inline-block");
                     $('#chart_input').css("display","none");
                     $('#chart_type_preview').css("display","inline-block");
-                    $("#chart_img_src").prop("src","./img/" +$(this).prop("id")+".png");
+                    $("#chart_img_src").prop("src","src/img/" +$(this).prop("id")+".png");
                     $('#scatter_line').css("display","none");
                     chart_type = $(this).prop("id");
                 });

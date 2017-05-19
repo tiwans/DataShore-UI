@@ -113,7 +113,7 @@ function creat_project(){
 }
 
 function showTut(){
-    var tut_innerHTML='<div><img src="../img/tut_1.1.png" alt="tutorial_1" id="tut_img_1"><img src="../img/tut_2.png" alt="tutorial_2" id="tut_img_2"></div>';
+    var tut_innerHTML='<div><img src="src/img/tut_1.1.png" alt="tutorial_1" id="tut_img_1"><img src="src/img/tut_2.png" alt="tutorial_2" id="tut_img_2"></div>';
     var tut_btn = '<button type="button" class="mdl-button mdl-button--fab" id="tut_btn_done" onClick="removeTut()"><i class="material-icons" id="tut_icon">clear</i></button>'
     $("#modal_tut").modal();
         $("#tut_leave").click(function(){
