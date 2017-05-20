@@ -1,3 +1,5 @@
+/* SIGNIN/ SIGNUP FORM */
+/*=====================*/
 *, *:before, *:after {
   box-sizing: border-box;
 }
@@ -25,7 +27,6 @@ a:hover {
   background: rgba(19, 35, 47, 0.9);
   padding: 40px;
   max-width: 600px;
-  margin: 40px auto;
   border-radius: 4px;
   box-shadow: 0 4px 10px 4px rgba(19, 35, 47, 0.3);
 }
@@ -175,4 +176,13 @@ textarea {
 .forgot {
   margin-top: -20px;
   text-align: right;
+}
+/* END OF SIGN IN/ SIGN UP FORM */
+/*=====================*/
+
+/* PRODUCT INTRODUCTION */
+/*=====================*/
+#section_b{
+  background-color: #d6e5ff;
+  box-shadow: 0 4px 10px 4px rgba(19, 35, 47, 0.3);
 }

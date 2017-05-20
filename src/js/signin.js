@@ -118,6 +118,21 @@ function signin(){
             alert(err.message);
         });
 }
+//* ############ END OF SIGN IN FORM ############ *//
+
+//* ############ START OF PRODUCT INTRO ############ *//
+$("#role").click(function(){
+    console.log($("#role").prop("id"));
+    $("#support_img_src").prop("src","src/img/User Icon.png");
+})
+$("#problem").click(function(){
+    console.log($("#problem").prop("id"));
+    $("#support_img_src").prop("src","src/img/Problem.svg");
+})
+$("#solution").click(function(){
+    console.log($("#solution").prop("id"));
+    $("#support_img_src").prop("src","src/img/Buoyocean.svg");
+})
 
 
 
