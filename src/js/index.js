@@ -1,7 +1,6 @@
 "use strict";
-
 // init variables
-var USER; // the current user
+var USER = ""; // the current user
 var stage_content = document.getElementById('stage_content');
 var project_name;
 var stg_count=0;
@@ -14,26 +13,17 @@ var pred_var;
 var upload_var;
 var template_var = [];
 var stg_array=['creat_pro_stg','select_var_stg','upload_dt_stg','view_dt_stg'];
-//############## Initialize Firebase ##############//
-var config = {
-    apiKey: "AIzaSyANfwhjv-oRcJhVp6sQfArTorgh4jsZFJw",
-    authDomain: "datashore-7057d.firebaseapp.com",
-    databaseURL: "https://datashore-7057d.firebaseio.com",
-    projectId: "datashore-7057d",
-    storageBucket: "datashore-7057d.appspot.com",
-    messagingSenderId: "352958906618"
-  };
-firebase.initializeApp(config);
+//############## Initialize Firebase ##############//"
 var database = firebase.database();
 //############## Authentication User ##############//
-init();
+authenticateUser();
 function authenticateUser(){
     firebase.auth().onAuthStateChanged(function(currUser) {
         if (currUser) {
             // User is signed in.
             USER = currUser;
-            console.log(USER.displayName);
             sessionStorage.USER = USER.displayName;
+            init();
         } else {
             // No user is signed in.
             window.location.href = "signin.html";
@@ -50,11 +40,11 @@ var output_dt="<div class='home panel' id='output_dt'><div class='panel-heading'
 //##############End of Different Process Stage###########//
 //#### init ####//
 function init(){
-    authenticateUser();
-    console.log(sessionStorage.USER);
-    var dataRef = database.ref('project/').child(sessionStorage.USER);
-    dataRef.once("value",function(snapshot){
-        if(snapshot.toJSON() != null){
+    console.log(USER.displayName);
+    var dataRef = database.ref('project/'+ USER.displayName);
+    dataRef.on("value",function(snapshot){
+        console.log(snapshot.exists());
+        if(snapshot.exists()){
             console.log("get_list");
             get_list();
         }else{

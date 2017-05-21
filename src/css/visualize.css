@@ -61,7 +61,9 @@
     width: 90%;
     margin: auto;
     display: flex;
-    justify-content: space-around;
+    flex-direction: row;
+    flex-wrap: wrap;
+    /*justify-content: space-around;*/
 }
 
 #add_chart_btn{

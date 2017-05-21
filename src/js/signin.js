@@ -43,17 +43,6 @@ $('.tab a').on('click', function (e) {
 });
 
 
-var config = {
-    apiKey: "AIzaSyANfwhjv-oRcJhVp6sQfArTorgh4jsZFJw",
-    authDomain: "datashore-7057d.firebaseapp.com",
-    databaseURL: "https://datashore-7057d.firebaseio.com",
-    projectId: "datashore-7057d",
-    storageBucket: "datashore-7057d.appspot.com",
-    messagingSenderId: "352958906618"
-  };
-firebase.initializeApp(config);
-
-
 //* ############ SIGN UP FORM ############ *//
 var signUpForm = document.getElementById("signup-form");
 var emailInput = document.getElementById("email-input");
@@ -91,7 +80,7 @@ function authenticateUser(){
         console.log("authentication called");
         if (currUser) {
             // User is signed in.
-            window.location.href = "index.html";
+            window.location = "index.html";
         }
     });
 }

@@ -3,8 +3,8 @@
 	<head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-		<link href = "src/css/index.css" type = "text/css" rel = "stylesheet" />
 		<title>DataShore</title>
+        <link href = "src/css/index.css" type = "text/css" rel = "stylesheet" />
 		<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.0/jquery.min.js"></script>
         <script src="https://www.gstatic.com/firebasejs/3.9.0/firebase.js"></script>
         <link href="https://d13yacurqjgara.cloudfront.net/users/168152/screenshots/2082130/justinblock_wave_800x600r1.jpg" type="image/png" rel="shortcut icon" />
@@ -19,6 +19,9 @@
         <script src="https://unpkg.com/react@latest/dist/react.js"></script>
         <script src="https://unpkg.com/react-dom@latest/dist/react-dom.js"></script>
         <script src="https://unpkg.com/babel-standalone@6.15.0/babel.min.js"></script>
+        <script src="src/jquery.csv.js"></script>
+        <script src="src/js/common.js"></script>
+        <script src="src/js/index.js"></script>
 	</head>
 	
 	<body id='body'>
@@ -86,7 +89,7 @@
                 </br>
             <main class="mdl-layout__content" id="container">
                  <!-- Div for create new project-->
-                <div id="creat_new_project">
+                <div class = "contianer" id="creat_new_project">
                     <div class="process_bar">
                         <div class="row bs-wizard" style="border-bottom:0;">
                     
@@ -138,8 +141,4 @@
         </div>
 	</body>
     <!--<script src="src/tutorial.js"></script>-->
-    <script src="src/jquery.csv.js"></script>
-    <!--<script src="src/common.js"></script>-->
-    <script src="src/js/index.js"></script>
-    <!--<script src="src/index.jsx"></script>-->
 </html>

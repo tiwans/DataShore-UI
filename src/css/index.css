@@ -140,3 +140,8 @@ h1 {
     left: 3%;
     top: 70px;
 }
+
+/* ccreat_new_project */
+#creat_new_project, #view_project_list{
+    display: none;
+}

@@ -1,13 +1,14 @@
 "use strict"
-
-// var config = {
-//     apiKey: "AIzaSyDkBifE9dCgqzn4ivf5uD7RXSwfN99Na_o",
-//     authDomain: "workflow-462a4.firebaseapp.com",
-//     databaseURL: "https://workflow-462a4.firebaseio.com",
-//     storageBucket: "workflow-462a4.appspot.com",
-//     messagingSenderId: "889877406021"
-// };
-// firebase.initializeApp(config);
+console.log("common.js called");
+var config = {
+apiKey: "AIzaSyANfwhjv-oRcJhVp6sQfArTorgh4jsZFJw",
+authDomain: "datashore-7057d.firebaseapp.com",
+databaseURL: "https://datashore-7057d.firebaseio.com",
+projectId: "datashore-7057d",
+storageBucket: "datashore-7057d.appspot.com",
+messagingSenderId: "352958906618"
+};
+firebase.initializeApp(config);
 
 function runPyScript(input){
         var jqXHR = $.ajax({

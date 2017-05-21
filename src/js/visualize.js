@@ -3,15 +3,6 @@
 //############## Initialize ##############//
 var project_name=sessionStorage.getItem("project_name")
 var USER=sessionStorage.getItem("USER");
-var config = {
-    apiKey: "AIzaSyANfwhjv-oRcJhVp6sQfArTorgh4jsZFJw",
-    authDomain: "datashore-7057d.firebaseapp.com",
-    databaseURL: "https://datashore-7057d.firebaseio.com",
-    projectId: "datashore-7057d",
-    storageBucket: "datashore-7057d.appspot.com",
-    messagingSenderId: "352958906618"
-  };
-firebase.initializeApp(config);
 var database = firebase.database();
 console.log(project_name);
 var output_res=[];
@@ -32,10 +23,11 @@ $("#signout").click(function(){
 });
 //############## End of Initialize ##############//
 
-dataRef.on('value', function(snapshot) {
+dataRef.once('value', function(snapshot) {
     snapshot.forEach(function(child) {
         //find the file and parse it into map//
         if(child.key == 'Uploaded_File'){
+            console.log("unploaded file called");
             output_res = child.val();
             output_res = $.csv.toArrays(output_res);
             output_res = output_res.slice(1);
@@ -57,12 +49,11 @@ dataRef.on('value', function(snapshot) {
                 }
             });
             window.data=myObject;
-            console.log(window.data);
+            // console.log(window.data);
         //end of parsing//
-
 ////############## Start of  of Profolie  and Chart from firebase##############//
-
             creat_profolie(myObject,headers);
+            display_chart();
             
 
 //################+++++++++++++++++++++################//
@@ -84,17 +75,16 @@ dataRef.on('value', function(snapshot) {
                 chart_content.setAttribute("style","display:block");
                 pro_content.setAttribute("style","display:none");
                 static_content.setAttribute("style","display:none");
-                 $("#nav_bead_li").html("Chart");
+                $("#nav_bead_li").html("Chart");
                 $("#nav_chart").prop("class","active");
                 $("#nav_pro").prop("class","abled");
-                 $("#nav_static").prop("class","abled");
-                display_chart();
+                $("#nav_static").prop("class","abled");
             })
             $("#nav_static").click(function(){
                 static_content.setAttribute("style","display:block");
                 chart_content.setAttribute("style","display:none");
                 pro_content.setAttribute("style","display:none");
-                 $("#nav_bead_li").html("Static");
+                $("#nav_bead_li").html("Static");
                 $("#nav_static").prop("class","active");
                 $("#nav_pro").prop("class","abled");
                 $("#nav_chart").prop("class","abled");
@@ -107,7 +97,7 @@ dataRef.on('value', function(snapshot) {
                 dataRef.once('value', function(snapshot) {
                     snapshot.forEach(function(chart) {
                         var chart = chart.toJSON();
-                        console.log(chart.var[0],chart.var[1]);
+                        console.log("draw graph called");
                         if(chart.chart_type =="line_chart" || chart.chart_type=="scatter_plot"){
                             create_scatter_line(chart.var[0],chart.var[1],chart.chart_type);
                         }else if(chart.chart_type=="box plot" || chart.chart_type=="histogram"){
@@ -115,11 +105,15 @@ dataRef.on('value', function(snapshot) {
                         }
                     });
                 });
+                //show the create chart modal
                 $('#add_chart_btn').on('click',function(){
+                    $(".var").prop("checked", false);
+                    console.log($(".var").prop("checked"));
                     $('#chart_list').css("display","none");
                     $('#chart_sel_modal').css("display","block");
                     $("#modal_next_next").css("display","none");
                 });
+                //select chart type
                 $('.list-group-item').click(function() {
                     $("#modal_next_next").css("display","none");
                     $("#modal_next").css("display","inline-block");
@@ -127,6 +121,7 @@ dataRef.on('value', function(snapshot) {
                     $('#chart_type_preview').css("display","inline-block");
                     $("#chart_img_src").prop("src","src/img/" +$(this).prop("id")+".png");
                     $('#scatter_line').css("display","none");
+                    $(".var").prop("checked", false);
                     chart_type = $(this).prop("id");
                 });
                 $("#modal_next").click(function(){
@@ -142,10 +137,10 @@ dataRef.on('value', function(snapshot) {
                             var x = {};
                             var y ={};
                             $.each($(".var:checkbox:checked"), function(){   
-                                console.log("clicked_create", $(this).val());     
+                                // console.log("clicked_create", $(this).val());     
                                 var $div = $(this).parent().parent();
                                 var $btn = $div.find(".jscolor");
-                                console.log($div.prop("class"));
+                                // console.log($div.prop("class"));
                                 if($btn.css("visibility")=="hidden"){
                                     x[""+$(this).val()]=myObject[""+$(this).val()]
                                 }
@@ -157,41 +152,46 @@ dataRef.on('value', function(snapshot) {
                             chart_id=Object.keys(x)[0]+"_"+Object.keys(y)[0]+"_"+chart_type;
                             variable.push(x);
                             variable.push(y);
-                            // console.log(sessionStorage.variable,sessionStorage.chart_id);
                             database.ref('project/' + sessionStorage.USER + "/" + sessionStorage.project_name +"/chart/"+chart_id).set({
                                 chart_type:chart_type,
                                 var:variable,
                                 pin:false,
                             });
-                             $('#chart_list').css("display","block");
+                            var ref = database.ref('project/' + sessionStorage.USER + "/" + sessionStorage.project_name +"/chart");
+                            ref.on("child_changed", function(snapshot) {
+                                var changedPost = snapshot.val();
+                                console.log("The updated post title is " + changedPost.chart_type);
+                            });
+                            $(".var").prop("checked", false);
+                            $('#chart_list').css("display","block");
                             create_scatter_line(x,y,chart_type);
                         });
                     }else if(chart_type=="box plot" || chart_type=="histogram"){
                         $("#modal_next_next").click(function(){
                             var y ={};
                             $.each($(".var:checkbox:checked"), function(){   
-                                console.log("clicked_create", $(this).val());     
+                                // console.log("clicked_create", $(this).val());     
                                 var $div = $(this).parent().parent();
                                 var $btn = $div.find(".jscolor");
-                                console.log($btn.prop("class"));
+                                // console.log($btn.prop("class"));
                                 // if($btn.css("visibility")=="hidden"){
                                 //     x[""+$(this).val()]=myObject[""+$(this).val()]
                                 // }
                                 if($btn.css("visibility")!="hidden"){
-                                    console.log("btn finded");
+                                    // console.log("btn finded");
                                     y[""+$(this).val()]=myObject[""+$(this).val()]
                                     y["color"]=$btn.css("background-color");
                                 }
                             });
                             variable.push(y);
                             chart_id=Object.keys(y)[0]+"_"+chart_type;
-                            // console.log(sessionStorage.variable,sessionStorage.chart_id);
                             database.ref('project/' + sessionStorage.USER + "/" + sessionStorage.project_name +"/chart/"+chart_id).set({
                                 chart_type:chart_type,
                                 var:variable,
                                 pin:false,
                             });
-                             $('#chart_list').css("display","block");
+                            $(".var").prop("checked", false);
+                            $('#chart_list').css("display","block");
                             create_box_hist(y,chart_type);
                         });
                     }
@@ -330,12 +330,12 @@ function creat_profolie(myObject,headers){
 //take in para: 
 //@x:array || @y:array ||@z_ary: dict,object ||@color_ary: dict,object
 function create_heatmap(x,y,z_ary,color_ary){
-    console.log(x,y,z_ary,color_ary);
+    // console.log(x,y,z_ary,color_ary);
     var parent_div=document.getElementById("chart_list");
     var map_var_count=Object.keys(z_ary).length;
     var column_length=4; //x.length;
     var row_length=9; //y.length;
-    console.log(column_length);
+    // console.log(column_length);
     for(var i=0; i <map_var_count; i++){
         var child_div = document.createElement("div");
         child_div.setAttribute("class","heatmap");
@@ -346,7 +346,7 @@ function create_heatmap(x,y,z_ary,color_ary){
         var yValues = [1,2,3,4,5,6,7,8,9];
 
         var zValues = z
-        console.log(xValues.length,yValues.length,zValues);
+        // console.log(xValues.length,yValues.length,zValues);
         var data = [{
                 x: xValues,
                 y: yValues,
@@ -372,11 +372,11 @@ function create_heatmap(x,y,z_ary,color_ary){
 
 //helper for heatmap
 function reorgZ_ary(array,column_length,row_length){
-    console.log("reorgZ_ary called",row_length + " " + column_length + " " + array.length);
+    // console.log("reorgZ_ary called",row_length + " " + column_length + " " + array.length);
     var z_res=[];
     for (var i=0; i<row_length; i++) {
         z_res[i] = array.slice(i*column_length,(i+1)*column_length);
-        console.log(i,z_res[i].length);
+        // console.log(i,z_res[i].length);
     }
     return z_res;
 }
@@ -386,7 +386,7 @@ function create_scatter_line(x,y,chart_type){
     var child_div = document.createElement("div");
     var y_keys = Object.keys(y);
     var x_keys=Object.keys(x);
-    var id=chart_type+"_"+x_keys[0]+"_"+y_keys[0];
+    var id;
     var y_list = y[y_keys[0]];
     var x_list = x[x_keys[0]];
     var y_tit = Object.keys(y)[0];
@@ -396,11 +396,13 @@ function create_scatter_line(x,y,chart_type){
         y_list = Object.values(y[y_keys[1]]);
         x_list = Object.values(x_list);
         y_tit = Object.keys(y)[1];
+        id=chart_type+"_"+x_keys[0]+"_"+y_keys[1];
         hexColor = y.color;
     }else{
        hexColor = rgb2hex(y[y_keys[1]])
+       id=chart_type+"_"+x_keys[0]+"_"+y_keys[0];
     }
-    console.log(x_list,y_list);
+    // console.log(x_list,y_list);
     if(chart_type=="scatter_plot"){
         var trace1 = {
             x: x_list,
@@ -418,8 +420,8 @@ function create_scatter_line(x,y,chart_type){
                 title: x_tit},
             yaxis: {
                 title: y_tit},
-            height: 500,
-            width:500
+            height: 400,
+            width:400
         };
         child_div.setAttribute("class","scatter");
         child_div.setAttribute("id",id);
@@ -440,8 +442,8 @@ function create_scatter_line(x,y,chart_type){
                 title: x_tit},
             yaxis: {
                 title: y_tit},
-            height: 500,
-            width:500
+            height: 400,
+            width:400
         };
         child_div.setAttribute("class","line");
         child_div.setAttribute("id",id);
@@ -455,17 +457,27 @@ function create_scatter_line(x,y,chart_type){
 }
 
 function create_box_hist(y,chart_type){
-    console.log(y,chart_type);
+    // console.log(y,chart_type);
     var parent_div=document.getElementById("chart_list");
     var child_div = document.createElement("div");
+    var id;
     var y_keys = Object.keys(y);
-    // var x_keys=Object.keys(x);
-    var id=chart_type+"_"+y_keys[0];
+    var y_list = y[y_keys[0]];
+    var y_tit = Object.keys(y)[0];
+    var hexColor;
+    if(y_keys[0]=="color"){
+        y_list = Object.values(y[y_keys[1]]);
+        y_tit = Object.keys(y)[1];
+        hexColor = y.color;
+        id=chart_type+"_"+y_keys[1];
+    }else{
+        hexColor = rgb2hex(y[y_keys[1]]);
+        id=chart_type+"_"+y_keys[0];
+    }
     if(chart_type=="box plot"){
-        var hexColor = rgb2hex(y[y_keys[1]]);
         var data = [
                     {
-                        y: y[y_keys[0]],
+                        y: y_list,
                         boxpoints: 'all',
                         jitter: 0.3,
                         pointpos: -1.8,
@@ -475,19 +487,18 @@ function create_box_hist(y,chart_type){
                     }
                     ];
         var layout = {
-            title:""+chart_type,
+            title: y_tit + " "+chart_type,
             yaxis: {
-                title: Object.keys(y)[0]},
-            height: 500,
-            width:500
+                title: y_tit},
+            height: 400,
+            width:400
         };
         child_div.setAttribute("class","box");
         child_div.setAttribute("id",id);
     }else{
-        var hexColor = rgb2hex(y[y_keys[1]]);
         var data = [
                     {
-                        x: y[y_keys[0]],
+                        x: y_list,
                         type:"histogram",
                         opacity: 0.5,
                         marker: {
@@ -496,11 +507,11 @@ function create_box_hist(y,chart_type){
                     }
                     ];
         var layout = {
-            title:""+chart_type,
-            xaxis: {title: Object.keys(y)[0]},
+            title:y_tit + ""+chart_type,
+            xaxis: {title: y_tit},
             yaxis: {title: "count"},
-            height: 500,
-            width:500
+            height: 400,
+            width:400
         };
         child_div.setAttribute("class","box");
         child_div.setAttribute("id",id);
@@ -510,7 +521,7 @@ function create_box_hist(y,chart_type){
     child_div.appendChild(checkbox);
     parent_div.appendChild(child_div);
     Plotly.newPlot(id,data,layout);
-    $(".js-plotly-plot").style.border = "2px solid black";
+    child_div.style.border = "2px solid black";
 }
 
 
@@ -526,18 +537,20 @@ $('.sct_lin_axis_dp ul.dropdown-menu li a').click(function (e) {
     $div.removeClass('open');
     if($(this).text()=="X"){
         $pbtn.css("visibility","hidden");
-        console.log($pbtn.css("visibility"));
+        // console.log($pbtn.css("visibility"));
     }else{
          $pbtn.css("visibility","visible");
-         console.log($pbtn.css("visibility"));
+        //  console.log($pbtn.css("visibility"));
     }
     e.preventDefault();
     return false;
 });
 
 
-function rgb2hex(rgb){
-    rgb = rgb.match(/^rgb?[\s+]?\([\s+]?(\d+)[\s+]?,[\s+]?(\d+)[\s+]?,[\s+]?(\d+)[\s+]?/i);
+function rgb2hex(input){
+    var input = "" + input;
+    // console.log(input.toArrays());
+    var rgb = input.match(/^rgb?[\s+]?\([\s+]?(\d+)[\s+]?,[\s+]?(\d+)[\s+]?,[\s+]?(\d+)[\s+]?/i);
     return (rgb && rgb.length === 4) ? "#" +
     ("0" + parseInt(rgb[1],10).toString(16)).slice(-2) +
     ("0" + parseInt(rgb[2],10).toString(16)).slice(-2) +
