@@ -1,12 +1,14 @@
 "use strict";
 
 //############## Initialize ##############//
-var project_name=sessionStorage.getItem("project_name")
-var USER=sessionStorage.getItem("USER");
+var USER;
 var database = firebase.database();
-console.log(project_name);
+var s1 = window.location.search.substring(1, location.search.length).split('=');
+var project_name = s1[1];
 var output_res=[];
-var dataRef = database.ref('project/' + USER + "/" + project_name);
+var dataRef;
+var headers;
+var myObject;
 var pro_content = document.getElementById("page_content_profile");
 var chart_content = document.getElementById("page_content_chart");
 var static_content = document.getElementById("page_content_static");
@@ -21,189 +23,86 @@ $("#signout").click(function(){
         console.error('Sign Out Error', error);
     });
 });
-//############## End of Initialize ##############//
-
-dataRef.once('value', function(snapshot) {
-    snapshot.forEach(function(child) {
-        //find the file and parse it into map//
-        if(child.key == 'Uploaded_File'){
-            console.log("unploaded file called");
-            output_res = child.val();
-            output_res = $.csv.toArrays(output_res);
-            output_res = output_res.slice(1);
-            var lineArray = [];
-            output_res.forEach(function(infoArray, index){
-                var dataString = infoArray.join(",");
-                lineArray.push(dataString);
-            }); 
-            var csvContent = lineArray.join("\n");
-            var data= d3.csv.parse(csvContent);
-            var headers = d3.keys(data[0]);
-            var myObject = {};
-            headers.forEach(function(d) {
-                myObject[d] = [];
-            });
-            data.forEach(function(d) {
-                for (var key in d) {
-                    myObject[key].push(d[key]);
-                }
-            });
-            window.data=myObject;
-            // console.log(window.data);
-        //end of parsing//
-////############## Start of  of Profolie  and Chart from firebase##############//
-            creat_profolie(myObject,headers);
-            display_chart();
-            
-
-//################+++++++++++++++++++++################//
-//############## End of the Porfolie ##############//
-
-////############## Start of the Chart ##############//
-//################                    ################//
-//############## Start of the personalize chart ##############//
-            $("#nav_pro").click(function(){
-                pro_content.setAttribute("style","display:block");
-                static_content.setAttribute("style","display:none");
-                chart_content.setAttribute("style","display:none");
-                $("#nav_bead_li").html("Profile");
-                $("#nav_pro").prop("class","active");
-                $("#nav_chart").prop("class","abled");
-                $("#nav_static").prop("class","abled");
-            })
-            $("#nav_chart").click(function(){
-                chart_content.setAttribute("style","display:block");
-                pro_content.setAttribute("style","display:none");
-                static_content.setAttribute("style","display:none");
-                $("#nav_bead_li").html("Chart");
-                $("#nav_chart").prop("class","active");
-                $("#nav_pro").prop("class","abled");
-                $("#nav_static").prop("class","abled");
-            })
-            $("#nav_static").click(function(){
-                static_content.setAttribute("style","display:block");
-                chart_content.setAttribute("style","display:none");
-                pro_content.setAttribute("style","display:none");
-                $("#nav_bead_li").html("Static");
-                $("#nav_static").prop("class","active");
-                $("#nav_pro").prop("class","abled");
-                $("#nav_chart").prop("class","abled");
-            })
-            function display_chart(){
-                // chart_content.innerHTML="<p>hello</p>";
-                var chart_type;
-                var dataRef = database.ref('project/' + sessionStorage.USER +  "/" + project_name +"/chart/");
-                var pined_chart =document.getElementById("pined_chart");
-                dataRef.once('value', function(snapshot) {
-                    snapshot.forEach(function(chart) {
-                        var chart = chart.toJSON();
-                        console.log("draw graph called");
-                        if(chart.chart_type =="line_chart" || chart.chart_type=="scatter_plot"){
-                            create_scatter_line(chart.var[0],chart.var[1],chart.chart_type);
-                        }else if(chart.chart_type=="box plot" || chart.chart_type=="histogram"){
-                            create_box_hist(chart.var[0],chart.chart_type);
-                        }
-                    });
-                });
-                //show the create chart modal
-                $('#add_chart_btn').on('click',function(){
-                    $(".var").prop("checked", false);
-                    console.log($(".var").prop("checked"));
-                    $('#chart_list').css("display","none");
-                    $('#chart_sel_modal').css("display","block");
-                    $("#modal_next_next").css("display","none");
-                });
-                //select chart type
-                $('.list-group-item').click(function() {
-                    $("#modal_next_next").css("display","none");
-                    $("#modal_next").css("display","inline-block");
-                    $('#chart_input').css("display","none");
-                    $('#chart_type_preview').css("display","inline-block");
-                    $("#chart_img_src").prop("src","src/img/" +$(this).prop("id")+".png");
-                    $('#scatter_line').css("display","none");
-                    $(".var").prop("checked", false);
-                    chart_type = $(this).prop("id");
-                });
-                $("#modal_next").click(function(){
-                    var chart_id;
-                    var variable=[];
-                    $("#modal_next").css("display","none");
-                    console.log("chart_type",chart_type);
-                    $("#modal_next_next").css("display","inline-block");
-                    $('#chart_type_preview').css("display","none");
-                    $('#scatter_line').css("display","block");
-                    if(chart_type=="scatter_plot"||chart_type=="line_chart"){
-                        $("#modal_next_next").click(function(){
-                            var x = {};
-                            var y ={};
-                            $.each($(".var:checkbox:checked"), function(){   
-                                // console.log("clicked_create", $(this).val());     
-                                var $div = $(this).parent().parent();
-                                var $btn = $div.find(".jscolor");
-                                // console.log($div.prop("class"));
-                                if($btn.css("visibility")=="hidden"){
-                                    x[""+$(this).val()]=myObject[""+$(this).val()]
-                                }
-                                if($btn.css("visibility")!="hidden"){
-                                    y[""+$(this).val()]=myObject[""+$(this).val()]
-                                    y["color"]=$btn.css("background-color");
-                                }
-                            });
-                            chart_id=Object.keys(x)[0]+"_"+Object.keys(y)[0]+"_"+chart_type;
-                            variable.push(x);
-                            variable.push(y);
-                            database.ref('project/' + sessionStorage.USER + "/" + sessionStorage.project_name +"/chart/"+chart_id).set({
-                                chart_type:chart_type,
-                                var:variable,
-                                pin:false,
-                            });
-                            var ref = database.ref('project/' + sessionStorage.USER + "/" + sessionStorage.project_name +"/chart");
-                            ref.on("child_changed", function(snapshot) {
-                                var changedPost = snapshot.val();
-                                console.log("The updated post title is " + changedPost.chart_type);
-                            });
-                            $(".var").prop("checked", false);
-                            $('#chart_list').css("display","block");
-                            create_scatter_line(x,y,chart_type);
-                        });
-                    }else if(chart_type=="box plot" || chart_type=="histogram"){
-                        $("#modal_next_next").click(function(){
-                            var y ={};
-                            $.each($(".var:checkbox:checked"), function(){   
-                                // console.log("clicked_create", $(this).val());     
-                                var $div = $(this).parent().parent();
-                                var $btn = $div.find(".jscolor");
-                                // console.log($btn.prop("class"));
-                                // if($btn.css("visibility")=="hidden"){
-                                //     x[""+$(this).val()]=myObject[""+$(this).val()]
-                                // }
-                                if($btn.css("visibility")!="hidden"){
-                                    // console.log("btn finded");
-                                    y[""+$(this).val()]=myObject[""+$(this).val()]
-                                    y["color"]=$btn.css("background-color");
-                                }
-                            });
-                            variable.push(y);
-                            chart_id=Object.keys(y)[0]+"_"+chart_type;
-                            database.ref('project/' + sessionStorage.USER + "/" + sessionStorage.project_name +"/chart/"+chart_id).set({
-                                chart_type:chart_type,
-                                var:variable,
-                                pin:false,
-                            });
-                            $(".var").prop("checked", false);
-                            $('#chart_list').css("display","block");
-                            create_box_hist(y,chart_type);
-                        });
-                    }
-                });
-                $(".modal_leave").click(function(){
-                     $('#chart_list').css("display","block");
-                    $('#chart_sel_modal').prop("style","display:none");
-                })
-            }
+authenticateUser();
+function authenticateUser(){
+    firebase.auth().onAuthStateChanged(function(currUser) {
+        if (currUser) {
+            // User is signed in.
+            USER = currUser;
+            dataRef = database.ref('project/' + USER.displayName + "/" + project_name);
+            sessionStorage.USER = USER.displayName;
+            init();
+        } else {
+            // No user is signed in.
+            window.location.href = "signin.html";
         }
     });
-});
+}
+//############## End of Initialize ##############//
+function init(){
+    dataRef.once('value', function(snapshot) {
+        snapshot.forEach(function(child) {
+            //find the file and parse it into map//
+            if(child.key == 'Uploaded_File'){
+                console.log("unploaded file called");
+                output_res = child.val();
+                output_res = $.csv.toArrays(output_res);
+                output_res = output_res.slice(1);
+                var lineArray = [];
+                output_res.forEach(function(infoArray, index){
+                    var dataString = infoArray.join(",");
+                    lineArray.push(dataString);
+                }); 
+                var csvContent = lineArray.join("\n");
+                var data= d3.csv.parse(csvContent);
+                headers = d3.keys(data[0]);
+                myObject = {};
+                headers.forEach(function(d) {
+                    myObject[d] = [];
+                });
+                data.forEach(function(d) {
+                    for (var key in d) {
+                        myObject[key].push(d[key]);
+                    }
+                });
+                window.data=myObject;
+                creat_profolie(myObject,headers);
+                display_chart()
+            }  
+        });
+    });
+    ////############## Start of  of Profolie  and Chart from firebase##############//       
+    ////############## Start of the Chart ##############//
+    //################                    ################//
+    //############## Start of the personalize chart ##############//
+    $("#nav_pro").click(function(){
+        pro_content.setAttribute("style","display:block");
+        static_content.setAttribute("style","display:none");
+        chart_content.setAttribute("style","display:none");
+        $("#nav_bead_li").html("Profile");
+        $("#nav_pro").prop("class","active");
+        $("#nav_chart").prop("class","abled");
+        $("#nav_static").prop("class","abled");
+    })
+    $("#nav_chart").click(function(){
+        chart_content.setAttribute("style","display:block");
+        pro_content.setAttribute("style","display:none");
+        static_content.setAttribute("style","display:none");
+        $("#nav_bead_li").html("Chart");
+        $("#nav_chart").prop("class","active");
+        $("#nav_pro").prop("class","abled");
+        $("#nav_static").prop("class","abled");
+    })
+    $("#nav_static").click(function(){
+        static_content.setAttribute("style","display:block");
+        chart_content.setAttribute("style","display:none");
+        pro_content.setAttribute("style","display:none");
+        $("#nav_bead_li").html("Static");
+        $("#nav_static").prop("class","active");
+        $("#nav_pro").prop("class","abled");
+        $("#nav_chart").prop("class","abled");
+    })
+}
 
 // $.each($(".pin:checkbox:checked"), function(){ 
 //         var $div = $(this).parent().parent();
@@ -225,6 +124,7 @@ $(".pin").change(function() {
 
 
 function creat_profolie(myObject,headers){
+    console.log("create profolie called",myObject);
     var temp = {
                 y: myObject['pressure'],
                 x: myObject['temperature'],
@@ -327,6 +227,121 @@ function creat_profolie(myObject,headers){
         }
     })
 }
+
+
+function display_chart(){
+    // chart_content.innerHTML="<p>hello</p>";
+    var chart_type;
+    var dataRef = database.ref('project/' + USER.displayName +  "/" + project_name +"/chart/");
+    var pined_chart =document.getElementById("pined_chart");
+    dataRef.once('value', function(snapshot) {
+        snapshot.forEach(function(chart) {
+            var chart = chart.toJSON();
+            console.log("draw graph called");
+            if(chart.chart_type =="line_chart" || chart.chart_type=="scatter_plot"){
+                create_scatter_line(chart.var[0],chart.var[1],chart.chart_type);
+            }else if(chart.chart_type=="box plot" || chart.chart_type=="histogram"){
+                create_box_hist(chart.var[0],chart.chart_type);
+            }
+        });
+    });
+    //show the create chart modal
+    $('#add_chart_btn').on('click',function(){
+        $(".var").prop("checked", false);
+        console.log($(".var").prop("checked"));
+        $('#chart_list').css("display","none");
+        $('#chart_sel_modal').css("display","block");
+        $("#modal_next_next").css("display","none");
+    });
+    //select chart type
+    $('.list-group-item').click(function() {
+        $("#modal_next_next").css("display","none");
+        $("#modal_next").css("display","inline-block");
+        $('#chart_input').css("display","none");
+        $('#chart_type_preview').css("display","inline-block");
+        $("#chart_img_src").prop("src","src/img/" +$(this).prop("id")+".png");
+        $('#scatter_line').css("display","none");
+        $(".var").prop("checked", false);
+        chart_type = $(this).prop("id");
+    });
+    $("#modal_next").click(function(){
+        var chart_id;
+        var variable=[];
+        $("#modal_next").css("display","none");
+        console.log("chart_type",chart_type);
+        $("#modal_next_next").css("display","inline-block");
+        $('#chart_type_preview').css("display","none");
+        $('#scatter_line').css("display","block");
+        if(chart_type=="scatter_plot"||chart_type=="line_chart"){
+            $("#modal_next_next").click(function(){
+                var x = {};
+                var y ={};
+                $.each($(".var:checkbox:checked"), function(){   
+                    // console.log("clicked_create", $(this).val());     
+                    var $div = $(this).parent().parent();
+                    var $btn = $div.find(".jscolor");
+                    // console.log($div.prop("class"));
+                    if($btn.css("visibility")=="hidden"){
+                        x[""+$(this).val()]=myObject[""+$(this).val()]
+                    }
+                    if($btn.css("visibility")!="hidden"){
+                        y[""+$(this).val()]=myObject[""+$(this).val()]
+                        y["color"]=$btn.css("background-color");
+                    }
+                });
+                chart_id=Object.keys(x)[0]+"_"+Object.keys(y)[0]+"_"+chart_type;
+                variable.push(x);
+                variable.push(y);
+                database.ref('project/' + sessionStorage.USER + "/" + sessionStorage.project_name +"/chart/"+chart_id).set({
+                    chart_type:chart_type,
+                    var:variable,
+                    pin:false,
+                });
+                var ref = database.ref('project/' + sessionStorage.USER + "/" + sessionStorage.project_name +"/chart");
+                ref.on("child_changed", function(snapshot) {
+                    var changedPost = snapshot.val();
+                    console.log("The updated post title is " + changedPost.chart_type);
+                });
+                $(".var").prop("checked", false);
+                $('#chart_list').css("display","block");
+                create_scatter_line(x,y,chart_type);
+            });
+        }else if(chart_type=="box plot" || chart_type=="histogram"){
+            $("#modal_next_next").click(function(){
+                var y ={};
+                $.each($(".var:checkbox:checked"), function(){   
+                    // console.log("clicked_create", $(this).val());     
+                    var $div = $(this).parent().parent();
+                    var $btn = $div.find(".jscolor");
+                    // console.log($btn.prop("class"));
+                    // if($btn.css("visibility")=="hidden"){
+                    //     x[""+$(this).val()]=myObject[""+$(this).val()]
+                    // }
+                    if($btn.css("visibility")!="hidden"){
+                        // console.log("btn finded");
+                        y[""+$(this).val()]=myObject[""+$(this).val()]
+                        y["color"]=$btn.css("background-color");
+                    }
+                });
+                variable.push(y);
+                chart_id=Object.keys(y)[0]+"_"+chart_type;
+                database.ref('project/' + sessionStorage.USER + "/" + sessionStorage.project_name +"/chart/"+chart_id).set({
+                    chart_type:chart_type,
+                    var:variable,
+                    pin:false,
+                });
+                $(".var").prop("checked", false);
+                $('#chart_list').css("display","block");
+                create_box_hist(y,chart_type);
+            });
+        }
+    });
+    $(".modal_leave").click(function(){
+            $('#chart_list').css("display","block");
+        $('#chart_sel_modal').prop("style","display:none");
+    })
+}
+
 //take in para: 
 //@x:array || @y:array ||@z_ary: dict,object ||@color_ary: dict,object
 function create_heatmap(x,y,z_ary,color_ary){
