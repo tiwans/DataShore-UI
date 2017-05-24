@@ -177,6 +177,16 @@ textarea {
   margin-top: -20px;
   text-align: right;
 }
+
+
+.website_logo_huge{
+  position: relative;
+}
+
+/*.website_logo_huge img{
+  position: absolute;
+}*/
+
 /* END OF SIGN IN/ SIGN UP FORM */
 /*=====================*/
 

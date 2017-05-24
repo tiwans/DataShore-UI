@@ -13,8 +13,11 @@ h1 {
     width: 80%;
     margin: auto;
     display: flex;
+    flex-wrap: wrap; 
     justify-content: space-around;
+    align-items: flex-start;
 }
+
 
 #add_project_btn{
     background-color:lightblue;
@@ -22,8 +25,9 @@ h1 {
 
 
 .demo-card-square.mdl-card {
-  width: 320px;
-  height: 320px;
+  width: 280px;
+  height: 280px;
+  margin-bottom: 20px;
 }
 .demo-card-square > .mdl-card__title {
   color: #fff;
@@ -32,6 +36,7 @@ h1 {
 /* end of project card */
 
 
+/*main content part */
 .home{
     margin: auto;
     width: 50%;

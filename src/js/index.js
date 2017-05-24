@@ -42,7 +42,7 @@ var output_dt="<div class='home panel' id='output_dt'><div class='panel-heading'
 function init(){
     console.log(USER.displayName);
     var dataRef = database.ref('project/'+ USER.displayName);
-    dataRef.on("value",function(snapshot){
+    dataRef.once("value",function(snapshot){
         console.log(snapshot.exists());
         if(snapshot.exists()){
             console.log("get_list");
@@ -97,13 +97,279 @@ function get_list(){
 ///#####++++++++++++++++#####//
 ///###CREATE NEW PROJECT###//
 ///#####              #####//
-//#### tutorial ####//
 function creat_project(){
     $("#creat_new_project").css("display","block");
     $("#view_project_list").css("display","none");
     document.getElementById('stage_content').innerHTML = create_project;
 }
 
+//=== stg 0 === 
+//create project
+function creatPro(){
+    project_name = document.getElementById('project_name').value;
+    document.getElementById('stage_content').innerHTML = select_var;
+    document.getElementById("creat_pro_stg").classList.remove('active');
+    document.getElementById("creat_pro_stg").classList.add('complete');
+    document.getElementById("select_var_stg").classList.remove('disabled');
+    document.getElementById("select_var_stg").classList.add("active");
+    stg_count=0;
+    sessionStorage.setItem('project_name', project_name);
+}
+
+//=== stg 1 === 
+//select var
+function selectVar(evt){
+    console.log("selectVar")
+     evt.preventDefault();
+     var varSelect = document.getElementById("varSelect");
+    if(varSelect){
+        var varRequire = document.getElementById("variable-require-result");
+        if(varSelect.value == "salinity") {
+            varRequire.innerHTML = "<button type='button' class='mdl-chip' id='csvFileUpload' accept='.csv'><span class='mdl-chip__text'>Temperature</span></button> <button type='button' class='mdl-chip'><span class='mdl-chip__text'>Density</span></button> <div><button type='button' id='nextStep' class='btn btn-default stg_btn' onClick='startUpload()'><span class='mdl-chip__text'>Next</span></button></div>"
+            pred_var = 'salinity';
+            upload_var = ['temperature', 'density'];
+
+        }
+        if(varSelect.value == "temperature") {
+            varRequire.innerHTML = "<button type='button' class='mdl-chip' id='csvFileUpload' accept='.csv'><span class='mdl-chip__text'>Density</span></button> <button type='button' class='mdl-chip'><span class='mdl-chip__text'>Salinity</span></button>  <div><button type='button' id='nextStep' class='btn btn-default stg_btn' onClick='startUpload()'><span class='mdl-chip__text'>Next</span></button></div>"
+            pred_var = 'temperature';
+            upload_var = ['salinity', 'density'];
+        }
+        if(varSelect.value == "density") {
+            varRequire.innerHTML = "<button type='button' class='mdl-chip' id='csvFileUpload' accept='.csv'><span class='mdl-chip__text'>Temperature</span></button> <button type='button' class='mdl-chip'><span class='mdl-chip__text'>Salinity</span></button>  <div><button type='button' id='nextStep' class='btn btn-default stg_btn' onClick='startUpload()'><span class='mdl-chip__text'>Next</span></button></div>"
+            pred_var = 'density';
+            upload_var = ['temperature', 'salinity'];
+        }
+        template_var[0]=pred_var;
+        upload_var.forEach(function(data,index){
+            template_var[index+1]=data;
+        });
+        stg_count++;
+    }else{
+        console.log("null")
+    }
+}
+
+//=== stg 1.1 === 
+//download tempload before upload
+function startUpload(){
+    // Method that checks that the browser supports the HTML5 File API
+    downloadTemplate(template_var);
+    document.getElementById("select_var_stg").classList.remove('active');
+    document.getElementById("select_var_stg").classList.add('complete');
+    document.getElementById("upload_dt_stg").classList.remove('disabled');
+    document.getElementById("upload_dt_stg").classList.add("active");
+    document.getElementById('stage_content').innerHTML=upload_data;
+    stg_count++;
+}
+
+//=== stg 1.2 ===
+//download tempload before upload - helper function
+function downloadTemplate(template_var){
+    var csvContent = "data:text/csv;charset=utf-8,";
+    var output = [['data'],template_var];
+    output.forEach(function(infoArray, index){
+        console.log(infoArray);
+        var dataString = infoArray.join(",");
+        csvContent += index < output.length ? dataString+ "\n" : dataString;
+    }); 
+
+    var encodedUri = encodeURI(csvContent);
+    var link = document.createElement("a");
+    link.setAttribute("href", encodedUri);
+    link.setAttribute("download", project_name+"_template.csv");
+    document.body.appendChild(link); // Required for FF
+
+    link.click();
+}
+
+//=== stg 2 === 
+//browse to upload file
+function browse(evt) {
+    evt.preventDefault();
+    if (!browserSupportFileUpload()) {
+        alert('The File APIs are not fully supported in this browser!');
+    } else {
+        file = evt.target.files[0];
+    }   
+}
+
+
+//=== stg 2.1 === 
+//check browswer support upload or not
+function browserSupportFileUpload() {
+    var isCompatible = false;
+    if (window.File && window.FileReader && window.FileList && window.Blob) {
+        isCompatible = true;
+    }
+    return isCompatible;
+}
+
+//===stg 2.2 ===
+//upload the file
+function upload(){
+    var reader = new FileReader();
+    reader.readAsText(file);
+    reader.onload = function(evt) {
+        csvData = evt.target.result;
+        data = $.csv.toArrays(csvData);
+        if (data && data.length > 0) {
+            // $(document).ready(function(){
+            //     $.ajax({
+            //         type: "POST",
+            //         url: "src/test",
+            //         data: {csvData}
+            //     }).done(function() {
+            //     // do something
+            //         alert("finished");
+            //     });
+            // });
+            writeData(project_name);
+            viewOutput(data);
+        }else{
+            reader.onerror = function() {
+                alert('Unable to read ' + file.fileName);
+            };
+        }
+    }
+}
+
+//=== stg 2.3 === 
+//write the data to firebase
+function writeData(project_name){
+    database.ref('project/' + USER.displayName + "/" + project_name).set({
+        Project_Tittle: project_name,
+        CreateDate: Date(),
+        Uploaded_File: csvData,
+        Output_file: null,
+        Variable: "set1",
+        Chart:{},
+        User:{},
+        Collaboratores:{}
+    });
+    var project_list_div = document.getElementById("project_list");
+    var project_div = document.createElement("div");
+    project_div.setAttribute("class","project_card demo-card-square mdl-card mdl-shadow--2dp");
+    project_div.innerHTML="<div class='mdl-card__title mdl-card--expand'><h2 class='project_tit_text mdl-card__title-text'>"+project_name+"</h2></div><div class='project_card_content mdl-card__supporting-text'>"+Date()+"</div><div class='mdl-card__actions mdl-card--border'><a class='project_link mdl-button mdl-button--colored mdl-js-button mdl-js-ripple-effect' href='visualize.html?projectname="+ project_name +"'>View Updates</a></div>"
+    project_list_div.appendChild(project_div);
+}
+
+
+//=== stg 3 ===
+//view output
+function viewOutput(data){
+    console.log("view output function called");
+    alert('Imported -' + data.length + '- rows successfully!');
+    document.getElementById("upload_dt_stg").classList.remove('active');
+    document.getElementById("upload_dt_stg").classList.add('complete');
+    document.getElementById("view_dt_stg").classList.remove('disabled');
+    document.getElementById("view_dt_stg").classList.add("complete");
+    document.getElementById('stage_content').innerHTML = output_dt;
+    res_len = 1;
+    retrive_output(project_name);
+    creatTB(res_len);
+    stg_count++;
+}
+
+
+//=== stg 3.1 ===
+//retrieve output from firebase
+function retrive_output(project_name){
+    var dataRef = database.ref('project/' + USER.displayName +"/" + project_name);
+    dataRef.once('value', function(snapshot) {
+        snapshot.forEach(function(child) {
+            if(child.key == 'Uploaded_File'){
+                console.log(child.val());
+                output_res = child.val();
+            }
+        });
+    });
+}
+
+
+//=== stg 3.2 ===
+//create the table
+function creatTB(res_len){
+    var table = document.getElementById('output_table');
+    var tbody = document.createElement('tbody');
+    var startParse = false;
+    var nonbody_count = 0;
+    var index = 0;
+    output_res = $.csv.toArrays(output_res);
+    while(index < output_res.length){
+        var dataRow = output_res[index];
+        if(dataRow[0]=="data"){
+            nonbody_count = index + 1;
+            console.log(nonbody_count);
+            startParse = true;
+            index = index + 1;
+            dataRow = output_res[index];
+            var thead = document.createElement('thead');
+            var head_row = document.createElement('tr');
+            var head_cell = document.createElement('th');
+            head_cell.innerHTML = "#";
+            head_row.appendChild(head_cell);
+            dataRow.forEach(function(element, i){
+                var data_len = dataRow.length - res_len;
+                if(i < data_len){
+                    var head_cell = document.createElement('th');
+                    head_cell.innerHTML = element;
+                    head_row.appendChild(head_cell);
+                }else{
+                    var head_cell = document.createElement('th');
+                    head_cell.innerHTML = element + "(result)";
+                    head_row.appendChild(head_cell);
+                }
+            });
+            thead.appendChild(head_row);
+            table.appendChild(thead);
+        }else if(dataRow[0]!="data" && startParse){
+            var body_row = document.createElement('tr');
+            var body_index = document.createElement('th');
+            body_index.setAttribute("scope","row");
+            body_index.innerHTML = index-nonbody_count;
+            body_row.appendChild(body_index);
+            dataRow.forEach(function(element, i){
+                var body_cell = document.createElement('td');
+                body_cell.innerHTML = dataRow[i];
+                body_row.appendChild(body_cell);
+            });
+            tbody.appendChild(body_row);
+        }else{
+            //do nothing;
+        }
+        index = index + 1;
+    }
+    table.appendChild(tbody);
+}
+
+
+//=== stg 4 ===
+//download the file
+function download(){
+    var csvContent = "data:text/csv;charset=utf-8,";
+    var output = data.slice(1);
+    output.forEach(function(infoArray, index){
+        console.log(infoArray);
+        var dataString = infoArray.join(",");
+        csvContent += index < output.length ? dataString+ "\n" : dataString;
+    }); 
+
+    var encodedUri = encodeURI(csvContent);
+    var link = document.createElement("a");
+    link.setAttribute("href", encodedUri);
+    link.setAttribute("download", project_name+".csv");
+    document.body.appendChild(link); // Required for FF
+
+    link.click();
+    $("#creat_new_project").css("display","none");
+    $("#view_project_list").css("display","block");
+}
+
+
+
+//other function
+//#### tutorial ####//
 function showTut(){
     var tut_innerHTML='<div><img src="src/img/tut_1.1.png" alt="tutorial_1" id="tut_img_1"><img src="src/img/tut_2.png" alt="tutorial_2" id="tut_img_2"></div>';
     var tut_btn = '<button type="button" class="mdl-button mdl-button--fab" id="tut_btn_done" onClick="removeTut()"><i class="material-icons" id="tut_icon">clear</i></button>'
@@ -174,241 +440,4 @@ function rollback(clicked_id){
     }else if(stg_count == 3){
         stage_content.innerHTML = output_dt;
     }
-}
-
-// create project
-function creatPro(){
-    project_name = document.getElementById('project_name').value;
-    document.getElementById('stage_content').innerHTML = select_var;
-    document.getElementById("creat_pro_stg").classList.remove('active');
-    document.getElementById("creat_pro_stg").classList.add('complete');
-    document.getElementById("select_var_stg").classList.remove('disabled');
-    document.getElementById("select_var_stg").classList.add("active");
-    stg_count=0;
-    sessionStorage.setItem('project_name', project_name);
-}
-
-//select var
-function selectVar(evt){
-    console.log("selectVar")
-     evt.preventDefault();
-     var varSelect = document.getElementById("varSelect");
-    if(varSelect){
-        console.log(varSelect.value)
-        var varRequire = document.getElementById("variable-require-result");
-        if(varSelect.value == "salinity") {
-            varRequire.innerHTML = "<button type='button' class='mdl-chip' id='csvFileUpload' accept='.csv'><span class='mdl-chip__text'>Temperature</span></button> <button type='button' class='mdl-chip'><span class='mdl-chip__text'>Density</span></button> <div><button type='button' id='nextStep' class='btn btn-default stg_btn' onClick='startUpload()'><span class='mdl-chip__text'>Next</span></button></div>"
-            pred_var = 'salinity';
-            upload_var = ['temperature', 'density'];
-
-        }
-        if(varSelect.value == "temperature") {
-            varRequire.innerHTML = "<button type='button' class='mdl-chip' id='csvFileUpload' accept='.csv'><span class='mdl-chip__text'>Density</span></button> <button type='button' class='mdl-chip'><span class='mdl-chip__text'>Salinity</span></button>  <div><button type='button' id='nextStep' class='btn btn-default stg_btn' onClick='startUpload()'><span class='mdl-chip__text'>Next</span></button></div>"
-            pred_var = 'temperature';
-            upload_var = ['salinity', 'density'];
-        }
-        if(varSelect.value == "density") {
-            varRequire.innerHTML = "<button type='button' class='mdl-chip' id='csvFileUpload' accept='.csv'><span class='mdl-chip__text'>Temperature</span></button> <button type='button' class='mdl-chip'><span class='mdl-chip__text'>salinity</span></button>  <div><button type='button' id='nextStep' class='btn btn-default stg_btn' onClick='startUpload()'><span class='mdl-chip__text'>Next</span></button></div>"
-            pred_var = 'density';
-            upload_var = ['temperature', 'salinity'];
-        }
-        template_var[0]=pred_var;
-        upload_var.forEach(function(data,index){
-            template_var[index+1]=data;
-        });
-        stg_count++;
-    }else{
-        console.log("null")
-    }
-}
-
-//download tempload before upload
-function startUpload(){
-    // Method that checks that the browser supports the HTML5 File API
-    downloadTemplate(template_var);
-    document.getElementById("select_var_stg").classList.remove('active');
-    document.getElementById("select_var_stg").classList.add('complete');
-    document.getElementById("upload_dt_stg").classList.remove('disabled');
-    document.getElementById("upload_dt_stg").classList.add("active");
-    document.getElementById('stage_content').innerHTML=upload_data;
-    stg_count++;
-}
-
-
-function browserSupportFileUpload() {
-    var isCompatible = false;
-    if (window.File && window.FileReader && window.FileList && window.Blob) {
-        isCompatible = true;
-    }
-    return isCompatible;
-}
-
-// Method that reads and processes the selected file
-function browse(evt) {
-    evt.preventDefault();
-    if (!browserSupportFileUpload()) {
-        alert('The File APIs are not fully supported in this browser!');
-    } else {
-        file = evt.target.files[0];
-    }   
-}
-
-//upload the file
-function upload(){
-    var reader = new FileReader();
-    reader.readAsText(file);
-    reader.onload = function(evt) {
-        csvData = evt.target.result;
-        data = $.csv.toArrays(csvData);
-        if (data && data.length > 0) {
-            // $(document).ready(function(){
-            //     $.ajax({
-            //         type: "POST",
-            //         url: "src/test",
-            //         data: {csvData}
-            //     }).done(function() {
-            //     // do something
-            //         alert("finished");
-            //     });
-            // });
-            writeData(project_name);
-
-            viewOutput(data);
-        }else{
-            reader.onerror = function() {
-                alert('Unable to read ' + file.fileName);
-            };
-        }
-    }
-}
-
-
-function writeData(project_name){
-    database.ref('project/' + USER.displayName + "/" + project_name).set({
-        Project_Tittle: project_name,
-        CreateDate: Date(),
-        Uploaded_File: csvData,
-        Output_file: null,
-        Variable: "set1",
-        Chart:{},
-        User:{},
-        Collaboratores:{}
-    });
-    console.log("finished");
-}
-
-function viewOutput(data){
-    alert('Imported -' + data.length + '- rows successfully!');
-    document.getElementById("upload_dt_stg").classList.remove('active');
-    document.getElementById("upload_dt_stg").classList.add('complete');
-    document.getElementById("view_dt_stg").classList.remove('disabled');
-    document.getElementById("view_dt_stg").classList.add("complete");
-    document.getElementById('stage_content').innerHTML = output_dt;
-    res_len = 1;
-    retrive_output(project_name);
-    creatTB(res_len);
-    stg_count++;
-}
-
-function download(){
-    var csvContent = "data:text/csv;charset=utf-8,";
-    var output = data.slice(1);
-    output.forEach(function(infoArray, index){
-        console.log(infoArray);
-        var dataString = infoArray.join(",");
-        csvContent += index < output.length ? dataString+ "\n" : dataString;
-    }); 
-
-    var encodedUri = encodeURI(csvContent);
-    var link = document.createElement("a");
-    link.setAttribute("href", encodedUri);
-    link.setAttribute("download", project_name+".csv");
-    document.body.appendChild(link); // Required for FF
-
-    link.click();
-    get_list();
-}
-
-function downloadTemplate(template_var){
-    var csvContent = "data:text/csv;charset=utf-8,";
-    var output = [['data'],template_var];
-    output.forEach(function(infoArray, index){
-        console.log(infoArray);
-        var dataString = infoArray.join(",");
-        csvContent += index < output.length ? dataString+ "\n" : dataString;
-    }); 
-
-    var encodedUri = encodeURI(csvContent);
-    var link = document.createElement("a");
-    link.setAttribute("href", encodedUri);
-    link.setAttribute("download", project_name+"_template.csv");
-    document.body.appendChild(link); // Required for FF
-
-    link.click();
-}
-
-function retrive_output(project_name){
-    var dataRef = database.ref('project/' + USER.displayName +"/" + project_name);
-    dataRef.once('value', function(snapshot) {
-        snapshot.forEach(function(child) {
-            if(child.key == 'Uploaded_File'){
-                console.log(child.val());
-                output_res = child.val();
-            }
-        });
-    });
-}
-
-function creatTB(res_len){
-    var table = document.getElementById('output_table');
-    var tbody = document.createElement('tbody');
-    var startParse = false;
-    var nonbody_count = 0;
-    var index = 0;
-    output_res = $.csv.toArrays(output_res);
-    while(index < output_res.length){
-        var dataRow = output_res[index];
-        if(dataRow[0]=="data"){
-            nonbody_count = index + 1;
-            console.log(nonbody_count);
-            startParse = true;
-            index = index + 1;
-            dataRow = output_res[index];
-            var thead = document.createElement('thead');
-            var head_row = document.createElement('tr');
-            var head_cell = document.createElement('th');
-            head_cell.innerHTML = "#";
-            head_row.appendChild(head_cell);
-            dataRow.forEach(function(element, i){
-                var data_len = dataRow.length - res_len;
-                if(i < data_len){
-                    var head_cell = document.createElement('th');
-                    head_cell.innerHTML = element;
-                    head_row.appendChild(head_cell);
-                }else{
-                    var head_cell = document.createElement('th');
-                    head_cell.innerHTML = element + "(result)";
-                    head_row.appendChild(head_cell);
-                }
-            });
-            thead.appendChild(head_row);
-            table.appendChild(thead);
-        }else if(dataRow[0]!="data" && startParse){
-            var body_row = document.createElement('tr');
-            var body_index = document.createElement('th');
-            body_index.setAttribute("scope","row");
-            body_index.innerHTML = index-nonbody_count;
-            body_row.appendChild(body_index);
-            dataRow.forEach(function(element, i){
-                var body_cell = document.createElement('td');
-                body_cell.innerHTML = dataRow[i];
-                body_row.appendChild(body_cell);
-            });
-            tbody.appendChild(body_row);
-        }else{
-            //do nothing;
-        }
-        index = index + 1;
-    }
-    table.appendChild(tbody);
 }
