@@ -2,18 +2,22 @@
 
 //############## Initialize ##############//
 var USER;
-var database = firebase.database();
-var s1 = window.location.search.substring(1, location.search.length).split('=');
-var project_name = s1[1];
 var output_res=[];
 var dataRef;
 var headers;
 var myObject;
+//init firebase
+var database = firebase.database();
+//get the project name
+var s1 = window.location.search.substring(1, location.search.length).split('=');
+var project_name = s1[1];
 var pro_content = document.getElementById("page_content_profile");
 var chart_content = document.getElementById("page_content_chart");
 var static_content = document.getElementById("page_content_static");
+//init the style of site
 chart_content.setAttribute("style","display:none");
 static_content.setAttribute("style","display:none");
+//fill out nav bar project name
 $("#nav_bead_pn").html(project_name);
 $("#signout").click(function(){
     console.log("click");
@@ -23,23 +27,24 @@ $("#signout").click(function(){
         console.error('Sign Out Error', error);
     });
 });
-authenticateUser();
-function authenticateUser(){
+authenticateUser_vis();
+function authenticateUser_vis(){
     firebase.auth().onAuthStateChanged(function(currUser) {
         if (currUser) {
             // User is signed in.
             USER = currUser;
             dataRef = database.ref('project/' + USER.displayName + "/" + project_name);
+            console.log(USER.displayName,project_name);
             sessionStorage.USER = USER.displayName;
-            init();
+            init_vis();
         } else {
             // No user is signed in.
             window.location.href = "signin.html";
         }
     });
 }
-//############## End of Initialize ##############//
-function init(){
+function init_vis(){
+    dataRef = database.ref('project/' + USER.displayName + "/" + project_name);
     dataRef.once('value', function(snapshot) {
         snapshot.forEach(function(child) {
             //find the file and parse it into map//
@@ -68,13 +73,14 @@ function init(){
                 window.data=myObject;
                 creat_profolie(myObject,headers);
                 display_chart()
+                output_res = child.val();
+                display_static(1);
             }  
         });
     });
-    ////############## Start of  of Profolie  and Chart from firebase##############//       
-    ////############## Start of the Chart ##############//
-    //################                    ################//
-    //############## Start of the personalize chart ##############//
+//############## End of Initialize ##############//
+
+//############## Strat of Page Swicth ##############//
     $("#nav_pro").click(function(){
         pro_content.setAttribute("style","display:block");
         static_content.setAttribute("style","display:none");
@@ -120,8 +126,6 @@ $(".pin").change(function() {
     //     console.log("content",$sub_div);
     // }
 });
-
-
 
 function creat_profolie(myObject,headers){
     console.log("create profolie called",myObject);
@@ -230,11 +234,9 @@ function creat_profolie(myObject,headers){
 
 
 function display_chart(){
-    // chart_content.innerHTML="<p>hello</p>";
     var chart_type;
-    var dataRef = database.ref('project/' + USER.displayName +  "/" + project_name +"/chart/");
     var pined_chart =document.getElementById("pined_chart");
-    dataRef.once('value', function(snapshot) {
+    dataRef.child("/chart").once('value', function(snapshot) {
         snapshot.forEach(function(chart) {
             var chart = chart.toJSON();
             console.log("draw graph called");
@@ -255,6 +257,9 @@ function display_chart(){
     });
     //select chart type
     $('.list-group-item').click(function() {
+        $('.list-group-item').removeClass("active");
+        // $('.list-group-item').prop("class","abled");
+        $(this).addClass("active");
         $("#modal_next_next").css("display","none");
         $("#modal_next").css("display","inline-block");
         $('#chart_input').css("display","none");
@@ -276,11 +281,9 @@ function display_chart(){
             $("#modal_next_next").click(function(){
                 var x = {};
                 var y ={};
-                $.each($(".var:checkbox:checked"), function(){   
-                    // console.log("clicked_create", $(this).val());     
+                $.each($(".var:checkbox:checked"), function(){     
                     var $div = $(this).parent().parent();
                     var $btn = $div.find(".jscolor");
-                    // console.log($div.prop("class"));
                     if($btn.css("visibility")=="hidden"){
                         x[""+$(this).val()]=myObject[""+$(this).val()]
                     }
@@ -292,15 +295,10 @@ function display_chart(){
                 chart_id=Object.keys(x)[0]+"_"+Object.keys(y)[0]+"_"+chart_type;
                 variable.push(x);
                 variable.push(y);
-                database.ref('project/' + sessionStorage.USER + "/" + sessionStorage.project_name +"/chart/"+chart_id).set({
+                dataRef.child("/chart/"+chart_id).set({
                     chart_type:chart_type,
                     var:variable,
                     pin:false,
-                });
-                var ref = database.ref('project/' + sessionStorage.USER + "/" + sessionStorage.project_name +"/chart");
-                ref.on("child_changed", function(snapshot) {
-                    var changedPost = snapshot.val();
-                    console.log("The updated post title is " + changedPost.chart_type);
                 });
                 $(".var").prop("checked", false);
                 $('#chart_list').css("display","block");
@@ -309,23 +307,17 @@ function display_chart(){
         }else if(chart_type=="box plot" || chart_type=="histogram"){
             $("#modal_next_next").click(function(){
                 var y ={};
-                $.each($(".var:checkbox:checked"), function(){   
-                    // console.log("clicked_create", $(this).val());     
+                $.each($(".var:checkbox:checked"), function(){     
                     var $div = $(this).parent().parent();
                     var $btn = $div.find(".jscolor");
-                    // console.log($btn.prop("class"));
-                    // if($btn.css("visibility")=="hidden"){
-                    //     x[""+$(this).val()]=myObject[""+$(this).val()]
-                    // }
                     if($btn.css("visibility")!="hidden"){
-                        // console.log("btn finded");
                         y[""+$(this).val()]=myObject[""+$(this).val()]
                         y["color"]=$btn.css("background-color");
                     }
                 });
                 variable.push(y);
                 chart_id=Object.keys(y)[0]+"_"+chart_type;
-                database.ref('project/' + sessionStorage.USER + "/" + sessionStorage.project_name +"/chart/"+chart_id).set({
+                dataRef.child("/chart/"+chart_id).set({
                     chart_type:chart_type,
                     var:variable,
                     pin:false,
@@ -341,6 +333,86 @@ function display_chart(){
         $('#chart_sel_modal').prop("style","display:none");
     })
 }
+
+function display_static(res_len){
+    creatTB(res_len)
+}
+
+//helper function to static site
+function creatTB(res_len){
+    var table = document.getElementById('output_table');
+    var tbody = document.createElement('tbody');
+    var startParse = false;
+    var nonbody_count = 0;
+    var index = 0;
+    output_res = $.csv.toArrays(output_res);
+    while(index < output_res.length){
+        var dataRow = output_res[index];
+        if(dataRow[0]=="data"){
+            nonbody_count = index + 1;
+            console.log(nonbody_count);
+            startParse = true;
+            index = index + 1;
+            dataRow = output_res[index];
+            var thead = document.createElement('thead');
+            var head_row = document.createElement('tr');
+            var head_cell = document.createElement('th');
+            head_cell.innerHTML = "#";
+            head_row.appendChild(head_cell);
+            dataRow.forEach(function(element, i){
+                var data_len = dataRow.length - res_len;
+                if(i < data_len){
+                    var head_cell = document.createElement('th');
+                    head_cell.innerHTML = element;
+                    head_row.appendChild(head_cell);
+                }else{
+                    var head_cell = document.createElement('th');
+                    head_cell.innerHTML = element + "(result)";
+                    head_row.appendChild(head_cell);
+                }
+            });
+            thead.appendChild(head_row);
+            table.appendChild(thead);
+        }else if(dataRow[0]!="data" && startParse){
+            var body_row = document.createElement('tr');
+            var body_index = document.createElement('th');
+            body_index.setAttribute("scope","row");
+            body_index.innerHTML = index-nonbody_count;
+            body_row.appendChild(body_index);
+            dataRow.forEach(function(element, i){
+                var body_cell = document.createElement('td');
+                body_cell.innerHTML = dataRow[i];
+                body_row.appendChild(body_cell);
+            });
+            tbody.appendChild(body_row);
+        }else{
+            //do nothing;
+        }
+        index = index + 1;
+    }
+    table.appendChild(tbody);
+}
+
+//helper function to static site
+function download(){
+    var csvContent = "data:text/csv;charset=utf-8,";
+    var output = output_res.slice(1);
+    output.forEach(function(infoArray, index){
+        console.log(infoArray);
+        var dataString = infoArray.join(",");
+        csvContent += index < output.length ? dataString+ "\n" : dataString;
+    }); 
+
+    var encodedUri = encodeURI(csvContent);
+    var link = document.createElement("a");
+    link.setAttribute("href", encodedUri);
+    link.setAttribute("download", project_name+".csv");
+    document.body.appendChild(link); // Required for FF
+
+    link.click();
+}
+
+//############## End of Page Swicth ##############//
 
 //take in para: 
 //@x:array || @y:array ||@z_ary: dict,object ||@color_ary: dict,object
@@ -571,3 +643,5 @@ function rgb2hex(input){
     ("0" + parseInt(rgb[2],10).toString(16)).slice(-2) +
     ("0" + parseInt(rgb[3],10).toString(16)).slice(-2) : '';
 }
+
+

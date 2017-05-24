@@ -367,7 +367,6 @@ function creatTB(res_len){
     var index = 0;
     output_res = $.csv.toArrays(output_res);
     while(index < output_res.length){
-        console.log(output_res[index]);
         var dataRow = output_res[index];
         if(dataRow[0]=="data"){
             nonbody_count = index + 1;
