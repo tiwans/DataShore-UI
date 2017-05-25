@@ -1,4 +1,15 @@
 /* page format */
+body{
+    position: relative;
+    background-image:url("/src/img/preview_image.jpg"),linear-gradient(to top, rgba(30, 75, 115, 1), rgba(255, 255, 255, 0));
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-blend-mode:darken;
+    background: -moz-linear-gradient(to right, rgba(30, 75, 115, 1), rgba(255, 255, 255, 0));
+    opacity:0.5,
+}
+
+
 #page-content{
     display: flex;
 }
@@ -15,6 +26,35 @@
     margin-left: 5%;
     margin-right: 5%;
 }
+
+/*nav bar */
+/* nav bar */
+#nav_header{
+    opacity:0.85;
+    background-color: #283299;
+}
+
+
+#nav_user_pro img{
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+}
+
+#nav_user_pro, .mdl-layout__drawer{
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+#drawer{
+    background-image: url("/src/img/Capstone-Orca-2.png");
+    background-repeat: no-repeat;
+    background-size: 200%;
+    background-position: bottom right;  
+}
+
 
 /* profile page */
 #line_switch{
@@ -55,6 +95,7 @@
 
 .js-plotly-plot{
     display: inline-block;
+    opacity: 0.8;
 }
 
 #chart_list, #add_chart_btn{
@@ -69,4 +110,10 @@
 #add_chart_btn{
     background-color:lightblue;
 }
+
+ #output_dt{
+     opacity: 0.8;
+     width: 80%;
+     margin: auto;
+ }
 

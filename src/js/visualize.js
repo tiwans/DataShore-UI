@@ -33,6 +33,7 @@ function authenticateUser_vis(){
         if (currUser) {
             // User is signed in.
             USER = currUser;
+            $("#nav_user_pro h4").html(USER.displayName);
             dataRef = database.ref('project/' + USER.displayName + "/" + project_name);
             console.log(USER.displayName,project_name);
             sessionStorage.USER = USER.displayName;
