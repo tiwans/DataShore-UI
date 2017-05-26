@@ -470,7 +470,7 @@ function reorgZ_ary(array,column_length,row_length){
 }
 
 function create_scatter_line(x,y,chart_type){
-    var parent_div=document.getElementById("chart_list");
+    var parent_div=document.getElementByClassName("chart_list");
     var child_div = document.createElement("div");
     var y_keys = Object.keys(y);
     var x_keys=Object.keys(x);

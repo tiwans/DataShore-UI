@@ -112,15 +112,15 @@ function signin(){
 //* ############ START OF PRODUCT INTRO ############ *//
 $("#role").click(function(){
     console.log($("#role").prop("id"));
-    $("#support_img_src").prop("src","src/img/User Icon.png");
+    $("#support_img_src").prop("src","src/img/Landing Page Image 1.png");
 })
 $("#problem").click(function(){
     console.log($("#problem").prop("id"));
-    $("#support_img_src").prop("src","src/img/Problem.svg");
+    $("#support_img_src").prop("src","src/img/Landing Page Image 2.png");
 })
 $("#solution").click(function(){
     console.log($("#solution").prop("id"));
-    $("#support_img_src").prop("src","src/img/Buoyocean.svg");
+    $("#support_img_src").prop("src","src/img/Landing Page Image 3.png");
 })
 
 

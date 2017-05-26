@@ -1,3 +1,4 @@
+
 /* SIGNIN/ SIGNUP FORM */
 /*=====================*/
 *, *:before, *:after {
@@ -70,7 +71,7 @@ a:hover {
 
 h1 {
   text-align: center;
-  color: #ffffff;
+  color: white;
   font-weight: 300;
   margin: 0 0 40px;
 }
@@ -87,6 +88,7 @@ label {
   pointer-events: none;
   font-size: 22px;
 }
+
 label .req {
   margin: 2px;
   color: #1ab188;
@@ -180,12 +182,28 @@ textarea {
 
 
 .website_logo_huge{
-  position: relative;
+  width: 80%;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  color: white;
+  font-size: 20px;
 }
 
-/*.website_logo_huge img{
-  position: absolute;
-}*/
+.website_logo_huge img{
+  width: 80%;
+  height: auto;
+}
+
+
+#section_a{
+  background-image: url('/src/img/smoke-waves-wallpaper-1.jpg');
+  background-color:rgba(255,0,0,0.5);
+  background-blend-mode: darken;
+  background-size: contain;
+  padding-bottom: 50px;
+}
+
 
 /* END OF SIGN IN/ SIGN UP FORM */
 /*=====================*/
@@ -195,4 +213,9 @@ textarea {
 #section_b{
   background-color: #d6e5ff;
   box-shadow: 0 4px 10px 4px rgba(19, 35, 47, 0.3);
+}
+
+#support_img_src{
+  width: 500px;
+  height: 600px;
 }
