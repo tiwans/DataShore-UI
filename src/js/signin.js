@@ -112,6 +112,7 @@ function signin(){
 //* ############ START OF PRODUCT INTRO ############ *//
 $("#role").click(function(){
     console.log($("#role").prop("id"));
+    $("#role").css("background-color","grey");
     $("#support_img_src").prop("src","src/img/Landing Page Image 1.png");
 })
 $("#problem").click(function(){

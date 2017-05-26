@@ -10,7 +10,7 @@ var myObject;
 var database = firebase.database();
 //get the project name
 var s1 = window.location.search.substring(1, location.search.length).split('=');
-var project_name = s1[1];
+var project_name = decodeURI(s1[1]);
 var pro_content = document.getElementById("page_content_profile");
 var chart_content = document.getElementById("page_content_chart");
 var static_content = document.getElementById("page_content_static");
@@ -250,23 +250,13 @@ function display_chart(){
     });
     //show the create chart modal
     $('#add_chart_btn').on('click',function(){
-        $(".var").prop("checked", false);
-        console.log($(".var").prop("checked"));
-        $('#chart_list').css("display","none");
-        $('#chart_sel_modal').css("display","block");
-        $("#modal_next_next").css("display","none");
+       model_default();
     });
     //select chart type
     $('.list-group-item').click(function() {
-        $('.list-group-item').removeClass("active");
-        // $('.list-group-item').prop("class","abled");
+        model_default();
         $(this).addClass("active");
-        $("#modal_next_next").css("display","none");
-        $("#modal_next").css("display","inline-block");
-        $('#chart_input').css("display","none");
-        $('#chart_type_preview').css("display","inline-block");
         $("#chart_img_src").prop("src","src/img/" +$(this).prop("id")+".png");
-        $('#scatter_line').css("display","none");
         $(".var").prop("checked", false);
         chart_type = $(this).prop("id");
     });
@@ -423,7 +413,6 @@ function create_heatmap(x,y,z_ary,color_ary){
     var map_var_count=Object.keys(z_ary).length;
     var column_length=4; //x.length;
     var row_length=9; //y.length;
-    // console.log(column_length);
     for(var i=0; i <map_var_count; i++){
         var child_div = document.createElement("div");
         child_div.setAttribute("class","heatmap");
@@ -470,7 +459,7 @@ function reorgZ_ary(array,column_length,row_length){
 }
 
 function create_scatter_line(x,y,chart_type){
-    var parent_div=document.getElementByClassName("chart_list");
+    var parent_div= document.getElementById("chart_list");
     var child_div = document.createElement("div");
     var y_keys = Object.keys(y);
     var x_keys=Object.keys(x);
@@ -643,6 +632,23 @@ function rgb2hex(input){
     ("0" + parseInt(rgb[1],10).toString(16)).slice(-2) +
     ("0" + parseInt(rgb[2],10).toString(16)).slice(-2) +
     ("0" + parseInt(rgb[3],10).toString(16)).slice(-2) : '';
+}
+
+//make the add new chart modal to default
+//clear out all slected field
+function model_default(){
+    $("#chart_img_src").prop("src","");
+    $('#chart_type_preview').css("display","inline-block");
+    $('.chart_input').css("display","none");
+    $('.list-group-item').removeClass("active");
+    $(".var").prop("checked", false);
+    $(".jscolor").css("visibility","visible");
+    $(".jscolor").css("background-color","white");
+    $(".jscolor").html("FFFFFF");
+    $('#chart_list').css("display","none");
+    $('#chart_sel_modal').css("display","block");
+    $("#modal_next_next").css("display","none");
+    $("#modal_next").css("display","inline-block");
 }
 
 

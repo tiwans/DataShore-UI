@@ -96,6 +96,7 @@ body{
 .js-plotly-plot{
     display: inline-block;
     opacity: 0.8;
+    justify-content: space-around;
 }
 
 #chart_list, #add_chart_btn{

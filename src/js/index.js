@@ -36,7 +36,7 @@ function authenticateUser(){
 var create_project = "<div class='home panel' id='create_project'><div class='panel-heading'><h2 class='panel-title'>Create Project</h2></div><div class='panel-body'>Name your project<div class='input-group project_name'><span class='input-group-addon' id='sizing-addon2'>Name</span><input type='text' class='form-control' placeholder='Project Name' aria-describedby='sizing-addon2' id='project_name'></div><button type='button' class='btn btn-default stg_btn' onClick=creatPro()>Create</button></div></div>";
 var select_var = '<div class="home panel" id="variable-select"><div class="panel-heading"><h2 class="panel-title">Select Variable</h2></div><div class="panel-body">Choose a varibale to predict!</div><div><select id="varSelect" class="dropdown" onchange="selectVar(event)"><option value="">---</option><option value="salinity">Salinity</option><option value="temperature">Temperature</option><option value="density">Density</option><option value="other">Other</option></select></div></div> <div class="home panel" id="variable-require"><div class="panel-heading"><h2 class="panel-title">Prepare to Upload your Data</h2></div><div class="panel-body">The required varables needed to predict</div><div><p id="variable-require-result"></p></div></div>';
 var upload_data = "<div class='home panel' id='upload_data'><div class='panel-heading'><h2 class='panel-title'>Upload Data</h2></div><div class='panel-body'>Choose the file to uploadupload_data<input type='file' name='File Upload' id='txtFileUpload' onChange='browse(event)' accept='.csv'/><button type='button' class='btn btn-default stg_btn' onClick='upload()'>Upload</button></div></div>";
-var output_dt="<div class='home panel' id='output_dt'><div class='panel-heading'><h2 class='panel-title'>View Output</h2></div><div class='panel-body'><div id=table_div'><table class='table table-striped' id='output_table'></table></div><button type='button' class='btn btn-default stg_btn' onClick=download()>Download Output and Exit</button><a href='visualize.html?projectname="+project_name +"' type='button' class='btn btn-default'>Continue to Dashboard</a></div></div>"
+var output_dt="<div class='home panel' id='output_dt'><div class='panel-heading'><h2 class='panel-title'>View Output</h2></div><div class='panel-body'><div id=table_div'><table class='table table-striped' id='output_table'></table></div><button type='button' class='btn btn-default stg_btn' onClick=download()>Download Output and Exit</button><button type='button' class='btn btn-default stg_btn' onClick=get_list()>Continue to Dashboard</button></div></div>"
 
 //##############End of Different Process Stage###########//
 //#### init ####//
@@ -70,6 +70,7 @@ function get_list(){
     $("#view_project_list").css("display","block");
     var dataRef = database.ref('project/' + USER.displayName);
     var project_list_div =document.getElementById("project_list");
+    project_list_div.innerHTML = "";
     dataRef.once('value', function(snapshot) {
         snapshot.forEach(function(child) {
                 var project = child.toJSON();
@@ -126,25 +127,32 @@ function selectVar(evt){
     if(varSelect){
         var varRequire = document.getElementById("variable-require-result");
         if(varSelect.value == "salinity") {
-            varRequire.innerHTML = "<button type='button' class='mdl-chip' id='csvFileUpload' accept='.csv'><span class='mdl-chip__text'>Temperature</span></button> <button type='button' class='mdl-chip'><span class='mdl-chip__text'>Density</span></button> <div><button type='button' id='nextStep' class='btn btn-default stg_btn' onClick='startUpload()'><span class='mdl-chip__text'>Next</span></button></div>"
             pred_var = 'salinity';
             upload_var = ['temperature', 'density'];
-
+            template_var[0]=pred_var;
+            upload_var.forEach(function(data,index){
+                template_var[index+1]=data;
+            });
+            varRequire.innerHTML = "<button type='button' class='mdl-chip' id='csvFileUpload' accept='.csv'><span class='mdl-chip__text'>Temperature</span></button> <button type='button' class='mdl-chip'><span class='mdl-chip__text'>Density</span></button> <div><button type='button' class='btn btn-default stg_btn' onClick='downloadTemplate(template_var)'><span class='mdl-chip__text'>Download Template</span></button><button type='button' id='nextStep' class='btn btn-default stg_btn' onClick='startUpload()'><span class='mdl-chip__text'>Next</span></button></div>"
         }
         if(varSelect.value == "temperature") {
-            varRequire.innerHTML = "<button type='button' class='mdl-chip' id='csvFileUpload' accept='.csv'><span class='mdl-chip__text'>Density</span></button> <button type='button' class='mdl-chip'><span class='mdl-chip__text'>Salinity</span></button>  <div><button type='button' id='nextStep' class='btn btn-default stg_btn' onClick='startUpload()'><span class='mdl-chip__text'>Next</span></button></div>"
             pred_var = 'temperature';
             upload_var = ['salinity', 'density'];
+            template_var[0]=pred_var;
+            upload_var.forEach(function(data,index){
+                template_var[index+1]=data;
+            });
+            varRequire.innerHTML = "<button type='button' class='mdl-chip' id='csvFileUpload' accept='.csv'><span class='mdl-chip__text'>Density</span></button> <button type='button' class='mdl-chip'><span class='mdl-chip__text'>Salinity</span></button>  <div><button type='button' class='btn btn-default stg_btn' onClick='downloadTemplate(template_var)'><span class='mdl-chip__text'>Download Template</span></button><button type='button' id='nextStep' class='btn btn-default stg_btn' onClick='startUpload()'><span class='mdl-chip__text'>Next</span></button></div>"
         }
         if(varSelect.value == "density") {
-            varRequire.innerHTML = "<button type='button' class='mdl-chip' id='csvFileUpload' accept='.csv'><span class='mdl-chip__text'>Temperature</span></button> <button type='button' class='mdl-chip'><span class='mdl-chip__text'>Salinity</span></button>  <div><button type='button' id='nextStep' class='btn btn-default stg_btn' onClick='startUpload()'><span class='mdl-chip__text'>Next</span></button></div>"
             pred_var = 'density';
             upload_var = ['temperature', 'salinity'];
+            template_var[0]=pred_var;
+            upload_var.forEach(function(data,index){
+                template_var[index+1]=data;
+            });
+            varRequire.innerHTML = "<button type='button' class='mdl-chip' id='csvFileUpload' accept='.csv'><span class='mdl-chip__text'>Temperature</span></button> <button type='button' class='mdl-chip'><span class='mdl-chip__text'>Salinity</span></button>  <div><button type='button' class='btn btn-default stg_btn' onClick='downloadTemplate(template_var)'><span class='mdl-chip__text'>Download Template</span></button><button type='button' id='nextStep' class='btn btn-default stg_btn' onClick='startUpload()'><span class='mdl-chip__text'>Next</span></button></div>"
         }
-        template_var[0]=pred_var;
-        upload_var.forEach(function(data,index){
-            template_var[index+1]=data;
-        });
         stg_count++;
     }else{
         console.log("null")
@@ -155,7 +163,6 @@ function selectVar(evt){
 //download tempload before upload
 function startUpload(){
     // Method that checks that the browser supports the HTML5 File API
-    downloadTemplate(template_var);
     document.getElementById("select_var_stg").classList.remove('active');
     document.getElementById("select_var_stg").classList.add('complete');
     document.getElementById("upload_dt_stg").classList.remove('disabled');
@@ -178,7 +185,7 @@ function downloadTemplate(template_var){
     var encodedUri = encodeURI(csvContent);
     var link = document.createElement("a");
     link.setAttribute("href", encodedUri);
-    link.setAttribute("download", project_name+"_template.csv");
+    link.setAttribute("download", sessionStorage.project_name+"_template.csv");
     document.body.appendChild(link); // Required for FF
 
     link.click();
@@ -276,7 +283,7 @@ function viewOutput(data){
 //=== stg 3.1 ===
 //retrieve output from firebase
 function retrive_output(project_name){
-    var dataRef = database.ref('project/' + USER.displayName +"/" + project_name);
+    var dataRef = database.ref('project/' + USER.displayName +"/" + encodeURI(project_name));
     dataRef.once('value', function(snapshot) {
         snapshot.forEach(function(child) {
             if(child.key == 'Uploaded_File'){
