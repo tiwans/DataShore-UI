@@ -1,7 +1,7 @@
 /* page format */
 body{
     position: relative;
-    background-image:url("/src/img/preview_image.jpg"),linear-gradient(to top, rgba(30, 75, 115, 1), rgba(255, 255, 255, 0));
+    background-image:url("src/img/preview_image.jpg"),linear-gradient(to top, rgba(30, 75, 115, 1), rgba(255, 255, 255, 0));
     background-repeat: no-repeat;
     background-size: cover;
     background-blend-mode:darken;
@@ -49,7 +49,7 @@ body{
 }
 
 #drawer{
-    background-image: url("/src/img/Capstone-Orca-2.png");
+    background-image: url("src/img/Capstone-Orca-2.png");
     background-repeat: no-repeat;
     background-size: 200%;
     background-position: bottom right;  

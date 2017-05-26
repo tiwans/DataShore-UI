@@ -197,7 +197,7 @@ textarea {
 
 
 #section_a{
-  background-image: url('/src/img/smoke-waves-wallpaper-1.jpg');
+  background-image: url('src/img/smoke-waves-wallpaper-1.jpg');
   background-color:rgba(255,0,0,0.5);
   background-blend-mode: darken;
   background-size: contain;
