@@ -412,6 +412,7 @@ function rollbaclModal(clicked_id){
     }else{
         $("#myModal").modal();
         $("#modal_leave").click(function(){
+            alert(clicked_id +" and " + stg_count);
             rollback(clicked_id);
         })
     }
@@ -433,12 +434,12 @@ function rollback(clicked_id){
     document.getElementById(stg_array[stg_count]).classList.remove('complete');
     document.getElementById(stg_array[stg_count]).classList.add('active');
     if(stg_count == 0){
-        stage_content.innerHTML = create_project;
+         document.getElementById('stage_content').innerHTML = create_project;
     }else if(stg_count == 1){
-        stage_content.innerHTML = select_var;
+         document.getElementById('stage_content').innerHTML = select_var;
     }else if(stg_count == 2){
-        stage_content.innerHTML = upload_data;
+         document.getElementById('stage_content').innerHTML= upload_data;
     }else if(stg_count == 3){
-        stage_content.innerHTML = output_dt;
+         document.getElementById('stage_content').innerHTML = output_dt;
     }
 }

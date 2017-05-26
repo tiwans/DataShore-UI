@@ -99,16 +99,26 @@ body{
 }
 
 #chart_list, #add_chart_btn{
-    width: 90%;
+    /*width: 90%;
     margin: auto;
     display: flex;
     flex-direction: row;
-    flex-wrap: wrap;
+    flex-wrap: wrap;*/
+    width: 90%;
+    margin: auto;
+    display: flex;
+    flex-wrap: wrap; 
+    justify-content: space-around;
+    align-items: flex-start;
     /*justify-content: space-around;*/
 }
 
 #add_chart_btn{
-    background-color:lightblue;
+    width: 40%;
+    height: 50px;
+    background-color:#323B48;
+    color: white;
+    box-shadow: 3px 3px 5px #888888
 }
 
  #output_dt{
